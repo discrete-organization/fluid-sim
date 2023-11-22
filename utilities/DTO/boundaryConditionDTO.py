@@ -30,4 +30,4 @@ class BoundaryConditionConstantVelocity(BoundaryConditionDelta):
 
 @dataclass
 class BoundaryConditionInitial(BoundaryConditionDelta):
-    function: D3Q19ParticleFunction
+    boltzmann_f19: D3Q19ParticleFunction
