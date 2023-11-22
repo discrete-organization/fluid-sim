@@ -1,7 +1,7 @@
 import json
 
-class BoundaryConditionsReader:
 
+class BoundaryConditionsReader:
     def __init__(self, file_path: str) -> None:
         try:
             with open(file_path, "r") as file:
