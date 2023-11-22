@@ -31,12 +31,8 @@ class BoundaryConditionsReader:
             cube_json = boundary_condition["cube"]
             data_json = boundary_condition["data"]
 
-            cube_start_position = Vector3Int(
-                cube_json["x"], cube_json["y"], cube_json["z"]
-            )
-            cube_end_position = cube_start_position + Vector3Int(
-                cube_json["width"], cube_json["height"], cube_json["depth"]
-            )
+            cube_start_position = Vector3Int(cube_json["x"], cube_json["y"], cube_json["z"])
+            cube_end_position = cube_start_position + Vector3Int(cube_json["width"], cube_json["height"], cube_json["depth"])
 
             boundary_cube = BoundaryCube(cube_start_position, cube_end_position)
 

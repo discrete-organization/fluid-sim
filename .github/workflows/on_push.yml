@@ -1,0 +1,17 @@
+name: Python Ruff & Black
+run-name: ${{ github.actor }} triggered workflow ${{ github.workflow }} from branch ${{ github.ref }}
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run black formatter           
+        uses: rickstaa/action-black@v1.3.1
+      - name: Ruff Check
+        uses: jpetrucciani/ruff-check@0.1.0
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+# - name: Run black formatter           
+#   uses: rickstaa/action-black@v1.3.1
+# - name: Ruff Check
+#   uses: jpetrucciani/ruff-check@0.1.0
