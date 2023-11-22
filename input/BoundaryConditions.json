@@ -1,1 +1,92 @@
-[]
+{
+    "fluid_box": {
+        "width": 20,
+        "height": 20,
+        "depth": 20
+    },
+    "boundaries": [
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 2,
+                "y": 2,
+                "z": 2,
+                "width": 2,
+                "height": 2,
+                "depth": 2
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "constant-velocity",
+            "cube": {
+                "x": 5,
+                "y": 5,
+                "z": 5,
+                "width": 2,
+                "height": 2,
+                "depth": 2
+            },
+            "data": {
+                "velocity": {
+                    "x": 0.1,
+                    "y": 0.1,
+                    "z": 0.1
+                }
+            }
+        },
+        {
+            "boundary_type": "constant-velocity",
+            "cube": {
+                "x": 5,
+                "y": 5,
+                "z": 5,
+                "width": 2,
+                "height": 2,
+                "depth": 2
+            },
+            "data": {
+                "velocity": {
+                    "x": -0.5,
+                    "y": -0.1,
+                    "z": 0.1
+                }
+            }
+        },
+        {
+            "boundary_type": "initial",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "width": 20,
+                "height": 20,
+                "depth": 20
+            },
+            "data": {
+                "boltzmann_f19": [
+                    0.2,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.5,
+                    0.1,
+                    0.02,
+                    0.02,
+                    0.02,
+                    0.005,
+                    0.005,
+                    0.005,
+                    0.005,
+                    0.005,
+                    0.005,
+                    0.001,
+                    0.001,
+                    0.001,
+                    0.001
+                ]
+            }
+        }
+    ]
+}
