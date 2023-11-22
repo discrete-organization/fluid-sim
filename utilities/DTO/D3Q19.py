@@ -1,6 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 
+
 @dataclass
 class D3Q19ParticleFunction:
     vectors: np.array

@@ -38,6 +38,15 @@ class Vector3Int:
     def __str__(self):
         return f"Vector3({self.vector})"
 
+    def get_x(self) -> int:
+        return int(self.vector[0])
+
+    def get_y(self) -> int:
+        return int(self.vector[1])
+
+    def get_z(self) -> int:
+        return int(self.vector[2])
+
 
 class Vector3Float:
     vector: np.ndarray[np.float64]
@@ -78,3 +87,12 @@ class Vector3Float:
 
     def __str__(self):
         return f"Vector3({self.vector})"
+
+    def get_x(self) -> float:
+        return float(self.vector[0])
+
+    def get_y(self) -> float:
+        return float(self.vector[1])
+
+    def get_z(self) -> float:
+        return float(self.vector[2])
