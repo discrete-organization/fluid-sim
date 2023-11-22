@@ -1,32 +1,80 @@
 import numpy as np
-from dataclasses import dataclass
 
 
-@dataclass
 class Vector3Int:
-    vector: np.array
+    vector: np.ndarray[np.int32]
+
+    @staticmethod
+    def _check_vector(vector):
+        if vector.shape != (3,):
+            raise ValueError(f"vector must be a 3D vector, but is {vector.shape}")
+
+        if vector.dtype != np.int32:
+            raise ValueError(f"vector must be of type int64, but is {vector.dtype}")
 
     def __init__(self, x: int, y: int, z: int) -> None:
         self.vector = np.array([x, y, z])
+        Vector3Int._check_vector(self.vector)
 
-    def __post_init__(self) -> None:
-        if self.vector.shape != (3,):
-            raise ValueError("vector must be a 3D vector.")
-        
-        if self.vector.dtype != np.int64:
-            raise ValueError("vector must be of type int64.")
+    @staticmethod
+    def from_numpy(vector: np.ndarray[np.int32]):
+        Vector3Int._check_vector(vector)
+        x, y, z = vector
+
+        return Vector3Int(x, y, z)
         
     def __add__(self, other):
-        return Vector3Int(self.vector + other.vector)
+        return Vector3Int.from_numpy(self.vector + other.vector)
     
     def __sub__(self, other):
-        return Vector3Int(self.vector - other.vector)
+        return Vector3Int.from_numpy(self.vector - other.vector)
     
     def __mul__(self, other):
-        return Vector3Int(self.vector * other)
+        return Vector3Int.from_numpy(self.vector * other)
     
+    def __floordiv__(self, other):
+        return Vector3Int.from_numpy(self.vector // other)
+    
+    def __str__(self):
+        return f"Vector3({self.vector})"
+
+
+class Vector3Float:
+    vector: np.ndarray[np.float64]
+
+    @staticmethod
+    def _check_vector(vector):
+        if vector.shape != (3,):
+            raise ValueError(f"vector must be a 3D vector, but is {vector.shape}")
+
+        if vector.dtype != np.float64:
+            raise ValueError(f"vector must be of type int64, but is {vector.dtype}")
+
+    def __init__(self, x: int, y: int, z: int) -> None:
+        self.vector = np.array([x, y, z])
+        Vector3Float._check_vector(self.vector)
+
+    @staticmethod
+    def from_numpy(vector: np.ndarray[np.float64]):
+        Vector3Float._check_vector(vector)
+        x, y, z = vector
+
+        return Vector3Float(x, y, z)
+
+    def __add__(self, other):
+        return Vector3Int.from_numpy(self.vector + other.vector)
+
+    def __sub__(self, other):
+        return Vector3Int.from_numpy(self.vector - other.vector)
+
+    def __mul__(self, other):
+        return Vector3Int.from_numpy(self.vector * other)
+
     def __truediv__(self, other):
-        return Vector3Int(self.vector / other)
-    
+        return Vector3Int.from_numpy(self.vector / other)
+
+    def __floordiv__(self, other):
+        return Vector3Int.from_numpy(self.vector // other)
+
     def __str__(self):
         return f"Vector3({self.vector})"

@@ -1,7 +1,7 @@
 import json
 from typing import Generator
 from utilities.DTO.D3Q19 import D3Q19ParticleFunction
-from utilities.DTO.vector3 import Vector3Int
+from utilities.DTO.vector3 import Vector3Int, Vector3Float
 from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionConstantVelocity,
     BoundaryConditionInitial,
@@ -15,7 +15,7 @@ class BoundaryConditionsReader:
     def __init__(self, file_path: str) -> None:
         try:
             with open(file_path, "r") as file:
-                self.json_content = json.load(file)
+                self._json_content = json.load(file)
 
         except FileNotFoundError:
             print("File not found. Please provide a valid file path.")
@@ -26,8 +26,8 @@ class BoundaryConditionsReader:
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-    def boundaryConditions(self) -> Generator[BoundaryConditionDelta, None, None]:
-        for boundary_condition in self.json_content["boundaries"]:
+    def boundary_conditions(self) -> Generator[BoundaryConditionDelta, None, None]:
+        for boundary_condition in self._json_content["boundaries"]:
             cube_json = boundary_condition["cube"]
             data_json = boundary_condition["data"]
 
@@ -44,9 +44,11 @@ class BoundaryConditionsReader:
                 case "no-slip":
                     yield BoundaryConditionNoSlip(boundary_cube)
                 case "constant-velocity":
+                    velocity_json = data_json["velocity"]
+
                     yield BoundaryConditionConstantVelocity(
                         boundary_cube,
-                        Vector3Int(data_json["x"], data_json["y"], data_json["z"]),
+                        Vector3Float(velocity_json["x"], velocity_json["y"], velocity_json["z"]),
                     )
                 case "initial":
                     yield BoundaryConditionInitial(

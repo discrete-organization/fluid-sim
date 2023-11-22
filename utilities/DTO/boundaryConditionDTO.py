@@ -1,8 +1,6 @@
-from abc import ABC
 from dataclasses import dataclass
-import numpy as np
 from utilities.DTO.D3Q19 import D3Q19ParticleFunction
-from utilities.DTO.vector3 import Vector3Int
+from utilities.DTO.vector3 import Vector3Int, Vector3Float
 
 
 @dataclass
@@ -12,21 +10,19 @@ class BoundaryCube:
 
 
 @dataclass
-class BoundaryConditionDelta(ABC):
+class BoundaryConditionDelta:
     boundary_cube: BoundaryCube
-
-    def __new__(cls, *args, **kwargs) -> None: 
-        if cls == BoundaryConditionDelta or cls.__bases__[0] == BoundaryConditionDelta: 
-            raise TypeError("Cannot instantiate abstract class.") 
 
 
 @dataclass
 class BoundaryConditionNoSlip(BoundaryConditionDelta):
     pass
 
+
 @dataclass
 class BoundaryConditionConstantVelocity(BoundaryConditionDelta):
-    velocity: Vector3Int
+    velocity: Vector3Float
+
 
 @dataclass
 class BoundaryConditionInitial(BoundaryConditionDelta):
