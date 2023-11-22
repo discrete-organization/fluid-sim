@@ -6,9 +6,10 @@ from dataclasses import dataclass
 class Vector3Int:
     vector: np.array
 
-    def __post_init__(self):
-        self.vector = np.array(self.vector)
+    def __init__(self, x: int, y: int, z: int) -> None:
+        self.vector = np.array([x, y, z])
 
+    def __post_init__(self) -> None:
         if self.vector.shape != (3,):
             raise ValueError("vector must be a 3D vector.")
         

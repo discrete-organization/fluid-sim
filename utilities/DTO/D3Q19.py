@@ -5,6 +5,9 @@ from dataclasses import dataclass
 class D3Q19ParticleFunction:
     vectors: np.array
 
+    def __init__(self, vectors: list[float]) -> None:
+        self.vectors = np.array(vectors)
+
     def __post_init__(self):
         self.vectors = np.array(self.vectors)
 

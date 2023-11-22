@@ -1,7 +1,8 @@
 import json
 from typing import Generator
+from utilities.DTO.D3Q19 import D3Q19ParticleFunction
 from utilities.DTO.vector3 import Vector3Int
-from utilities.DTO.boundaryConditionDTO import BoundaryConditionConstantVelocity, BoundaryConditionInitial, BoundaryCube, BoundaryConditionDelta
+from utilities.DTO.boundaryConditionDTO import BoundaryConditionConstantVelocity, BoundaryConditionInitial, BoundaryCube, BoundaryConditionDelta, BoundaryConditionNoSlip
 
 
 class BoundaryConditionsReader:
@@ -20,30 +21,21 @@ class BoundaryConditionsReader:
 
     def boundaryConditions(self) -> Generator[BoundaryConditionDelta, None, None]:
         for boundary_condition in self.json_content["boundaries"]:
+            cube_json = boundary_condition["cube"]
+            data_json = boundary_condition["data"]
+
+            cube_start_position = Vector3Int(cube_json["x"], cube_json["y"], cube_json["z"])
+            cube_end_position = cube_start_position + Vector3Int(cube_json["width"], cube_json["height"], cube_json["depth"])
+
+            boundary_cube = BoundaryCube(cube_start_position, cube_end_position)
+
             match boundary_condition["boundary_type"]:
                 case "no-slip":
-                    yield BoundaryConditionDelta(
-                        boundary_cube=BoundaryCube(
-                            start_position=Vector3Int(boundary_condition["start_position"]),
-                            end_position=Vector3Int(boundary_condition["end_position"])
-                        )
-                    )
+                    yield BoundaryConditionNoSlip(boundary_cube)
                 case "constant-velocity":
-                    yield BoundaryConditionConstantVelocity(
-                        boundary_cube=BoundaryCube(
-                            start_position=Vector3Int(boundary_condition["start_position"]),
-                            end_position=Vector3Int(boundary_condition["end_position"])
-                        ),
-                        velocity=Vector3Int(boundary_condition["velocity"])
-                    )
+                    yield BoundaryConditionConstantVelocity(boundary_cube, Vector3Int(data_json["x"], data_json["y"], data_json["z"]))
                 case "initial":
-                    yield BoundaryConditionInitial(
-                        boundary_cube=BoundaryCube(
-                            start_position=Vector3Int(boundary_condition["start_position"]),
-                            end_position=Vector3Int(boundary_condition["end_position"])
-                        ),
-                        function=boundary_condition["function"]
-                    )
+                    yield BoundaryConditionInitial(boundary_cube, D3Q19ParticleFunction(data_json["function"]))
                 case _:
                     raise ValueError("Invalid boundary condition type.")
             
