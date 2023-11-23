@@ -39,7 +39,7 @@ class FluidDirectionProvider:
     @staticmethod
     def get_direction(n: int) -> Vector3Int:
         if n < 0 or n > 18:
-            raise Exception("Invalid direction index.")
+            raise ValueError(f"n must be between 0 and 18, but is {n}")
 
         if n == 0:
             return FluidDirectionProvider.__get_direction_for_0(n)
