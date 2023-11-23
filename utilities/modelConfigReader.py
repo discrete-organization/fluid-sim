@@ -9,6 +9,7 @@ from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionDelta,
     BoundaryConditionNoSlipDelta,
 )
+from utilities.DTO.simulationParameters import SimulationParameters
 
 
 class ModelConfigReader:
@@ -60,3 +61,11 @@ class ModelConfigReader:
         depth = int(box_config_json["depth"])
 
         return Vector3Int(width, height, depth)
+
+    def simulation_parameters(self) -> SimulationParameters:
+        box_config_json = self._json_content["fluid_box"]
+        viscosity = float(box_config_json["viscosity"])
+        time_delta = float(box_config_json["time_delta"])
+        cell_length = float(box_config_json["cell_length"])
+
+        return SimulationParameters(viscosity, time_delta, cell_length)

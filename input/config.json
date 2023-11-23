@@ -2,7 +2,10 @@
     "fluid_box": {
         "width": 20,
         "height": 20,
-        "depth": 20
+        "depth": 20,
+        "viscosity": 0.1,
+        "time_delta": 0.1,
+        "cell_length": 1
     },
     "boundaries": [
         {
