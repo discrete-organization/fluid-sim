@@ -2,7 +2,6 @@ import numpy as np
 from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionNoSlipDelta,
     BoundaryConditionConstantVelocityDelta,
-    BoundaryConditionInitialDelta,
     BoundaryCube
 )
 
