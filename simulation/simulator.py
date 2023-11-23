@@ -1,11 +1,12 @@
 import pygame
-from simulation.fluidRenderer import FluidRenderer
+from .fluidRenderer import FluidRenderer
 from utilities.argsReader import ArgsReader
 from utilities.modelConfigReader import ModelConfigReader
 from model.boltzmannFluid import BoltzmannFluid
 from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionNoSlipDelta,
-    BoundaryConditionConstantVelocityDelta
+    BoundaryConditionConstantVelocityDelta,
+    BoundaryConditionInitialDelta
 )
 
 
@@ -19,8 +20,10 @@ class Simulator:
                     self._fluid.update_no_slip_boundary(no_slip_boundary_condition_delta)
                 case BoundaryConditionConstantVelocityDelta() as constant_velocity_boundary_condition_delta:
                     self._fluid.update_constant_velocity_boundary(constant_velocity_boundary_condition_delta)
+                case BoundaryConditionInitialDelta() as initial_boundary_condition_delta:
+                    self._fluid.update_initial_boundary(initial_boundary_condition_delta)
                 case _:
-                    raise ValueError("Invalid boundary condition type.")
+                    raise ValueError(f"Invalid boundary condition type: {type(boundary_condition_delta)}")
 
     def _pygame_init(self) -> None:
         pygame.init()
@@ -62,6 +65,7 @@ class Simulator:
         self._model_config_reader = ModelConfigReader(self._simulation_args.config_path)
 
     def run(self) -> None:
+        self._init_fluid()
         self._pygame_init()
         self._pygame_loop()
         self._pygame_quit()

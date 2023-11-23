@@ -10,7 +10,7 @@ class Vector3Int:
             raise ValueError(f"vector must be a 3D vector, but is {vector.shape}")
 
         if vector.dtype != np.int32:
-            raise ValueError(f"vector must be of type int64, but is {vector.dtype}")
+            raise ValueError(f"vector must be of type int32, but is {vector.dtype}")
 
     def __init__(self, x: int, y: int, z: int) -> None:
         self._vector = np.array([x, y, z])
@@ -52,6 +52,9 @@ class Vector3Int:
         y = int(self._vector[1])
         z = int(self._vector[2])
         return x, y, z
+
+    def to_numpy(self) -> np.ndarray[np.int32]:
+        return self._vector
 
 
 class Vector3Float:
@@ -108,3 +111,6 @@ class Vector3Float:
         y = float(self._vector[1])
         z = float(self._vector[2])
         return x, y, z
+
+    def to_numpy(self) -> np.ndarray[np.float64]:
+        return self._vector

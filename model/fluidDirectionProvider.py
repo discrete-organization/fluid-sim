@@ -14,7 +14,7 @@ class FluidDirectionProvider:
         one_position = k // 2
         value = -1 if k % 2 == 1 else 1
 
-        result = np.zeros(3)
+        result = np.zeros(3).astype(np.int32)
 
         result[one_position] = value
 
@@ -52,7 +52,7 @@ class FluidDirectionProvider:
         result = np.zeros((19, 3))
 
         for i in range(19):
-            result[i] = FluidDirectionProvider.get_direction(i)
+            result[i] = FluidDirectionProvider.get_direction(i).to_numpy()
 
         return result
 
@@ -60,4 +60,7 @@ class FluidDirectionProvider:
     def normalize_directions(directions: np.ndarray[np.ndarray[np.int32]]) -> np.ndarray[np.ndarray[np.int32]]:
         lengths = np.sqrt(np.sum(np.square(directions), -1))
 
-        return directions / lengths[:, None]
+        normalized_directions = np.zeros_like(directions)
+        normalized_directions[1:] = directions[1:] / lengths[1:, None]
+
+        return normalized_directions
