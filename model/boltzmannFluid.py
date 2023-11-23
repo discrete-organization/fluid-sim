@@ -2,8 +2,7 @@ from typing import Tuple
 from fluidDirectionProvider import FluidDirectionProvider
 from boltzmannFluidState import BoltzmannFluidState
 from boundaryConditions import NoSlipBoundaryConditions, ConstantVelocityBoundaryConditions
-from utilities.DTO.boundaryConditionDTO import BoundaryConditionDelta,\
-            BoundaryConditionNoSlip, BoundaryConditionConstantVelocity
+from utilities.DTO.boundaryConditionDTO import BoundaryConditionNoSlip, BoundaryConditionConstantVelocity
 
 
 class BoltzmannFluid:
