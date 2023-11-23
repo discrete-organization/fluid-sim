@@ -2,7 +2,7 @@ from typing import Tuple
 from fluidDirectionProvider import FluidDirectionProvider
 from boltzmannFluidState import BoltzmannFluidState
 from boundaryConditions import NoSlipBoundaryConditions, ConstantVelocityBoundaryConditions
-from utilities.DTO.boundaryConditionDTO import BoundaryConditionNoSlip, BoundaryConditionConstantVelocity
+from utilities.DTO.boundaryConditionDTO import BoundaryConditionNoSlipDelta, BoundaryConditionConstantVelocityDelta
 
 
 class BoltzmannFluid:
@@ -13,8 +13,8 @@ class BoltzmannFluid:
         self._no_slip_boundary_conditions = NoSlipBoundaryConditions(lattice_dimensions)
         self._constant_velocity_boundary_conditions = ConstantVelocityBoundaryConditions(lattice_dimensions)
 
-    def update_no_slip_boundary(self, boundary_condition_delta: BoundaryConditionNoSlip):
+    def update_no_slip_boundary(self, boundary_condition_delta: BoundaryConditionNoSlipDelta):
         self._no_slip_boundary_conditions.update_boundary(boundary_condition_delta)
 
-    def update_constant_velocity_boundary(self, boundary_condition_delta: BoundaryConditionConstantVelocity):
+    def update_constant_velocity_boundary(self, boundary_condition_delta: BoundaryConditionConstantVelocityDelta):
         self._constant_velocity_boundary_conditions.update_boundary(boundary_condition_delta)

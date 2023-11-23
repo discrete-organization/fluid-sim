@@ -3,15 +3,15 @@ from typing import Generator
 from utilities.DTO.D3Q19 import D3Q19ParticleFunction
 from utilities.DTO.vector3 import Vector3Int, Vector3Float
 from utilities.DTO.boundaryConditionDTO import (
-    BoundaryConditionConstantVelocity,
-    BoundaryConditionInitial,
+    BoundaryConditionConstantVelocityDelta,
+    BoundaryConditionInitialDelta,
     BoundaryCube,
     BoundaryConditionDelta,
-    BoundaryConditionNoSlip,
+    BoundaryConditionNoSlipDelta,
 )
 
 
-class BoundaryConditionsReader:
+class ModelConfigReader:
     def __init__(self, file_path: str) -> None:
         try:
             with open(file_path, "r") as file:
@@ -38,17 +38,25 @@ class BoundaryConditionsReader:
 
             match boundary_condition["boundary_type"]:
                 case "no-slip":
-                    yield BoundaryConditionNoSlip(boundary_cube)
+                    yield BoundaryConditionNoSlipDelta(boundary_cube)
                 case "constant-velocity":
                     velocity_json = data_json["velocity"]
 
-                    yield BoundaryConditionConstantVelocity(
+                    yield BoundaryConditionConstantVelocityDelta(
                         boundary_cube,
                         Vector3Float(velocity_json["x"], velocity_json["y"], velocity_json["z"]),
                     )
                 case "initial":
-                    yield BoundaryConditionInitial(
+                    yield BoundaryConditionInitialDelta(
                         boundary_cube, D3Q19ParticleFunction(data_json["boltzmann_f19"])
                     )
                 case _:
                     raise ValueError("Invalid boundary condition type.")
+
+    def lattice_dimensions(self) -> Vector3Int:
+        box_config_json = self._json_content["fluid_box"]
+        width = int(box_config_json["width"])
+        height = int(box_config_json["height"])
+        depth = int(box_config_json["depth"])
+
+        return Vector3Int(width, height, depth)

@@ -33,15 +33,15 @@ class BoundaryConditionDelta:
 
 
 @dataclass
-class BoundaryConditionNoSlip(BoundaryConditionDelta):
+class BoundaryConditionNoSlipDelta(BoundaryConditionDelta):
     pass
 
 
 @dataclass
-class BoundaryConditionConstantVelocity(BoundaryConditionDelta):
+class BoundaryConditionConstantVelocityDelta(BoundaryConditionDelta):
     velocity: Vector3Float
 
 
 @dataclass
-class BoundaryConditionInitial(BoundaryConditionDelta):
+class BoundaryConditionInitialDelta(BoundaryConditionDelta):
     boltzmann_f19: D3Q19ParticleFunction
