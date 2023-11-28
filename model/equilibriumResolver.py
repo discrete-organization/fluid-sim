@@ -1,2 +1,0 @@
-class EquilibriumResolver:
-    pass

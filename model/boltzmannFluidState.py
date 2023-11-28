@@ -3,7 +3,7 @@ from utilities.DTO.boundaryConditionDTO import BoundaryConditionInitialDelta
 
 
 class BoltzmannFluidState:
-    def __init__(self, shape, allowed_velocities: np.ndarray[np.float64]):
+    def __init__(self, shape, allowed_velocities: np.ndarray[np.ndarray[np.float64]]):
         # Make sure that the allowed velocities have correct lengths (c e)
         self.fluid_state: np.array = np.zeros(shape + (19,))
         self.allowed_velocities = allowed_velocities

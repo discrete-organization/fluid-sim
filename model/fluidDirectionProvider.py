@@ -57,10 +57,10 @@ class FluidDirectionProvider:
         return result
 
     @staticmethod
-    def normalize_directions(directions: np.ndarray[np.ndarray[np.int32]]) -> np.ndarray[np.ndarray[np.int32]]:
+    def normalize_directions(directions: np.ndarray[np.ndarray[np.int32]]) -> np.ndarray[np.ndarray[np.float64]]:
         lengths = np.sqrt(np.sum(np.square(directions), -1))
 
-        normalized_directions = np.zeros_like(directions)
+        normalized_directions = np.zeros_like(directions, dtype=np.float64)
         normalized_directions[1:] = directions[1:] / lengths[1:, None]
 
         return normalized_directions
