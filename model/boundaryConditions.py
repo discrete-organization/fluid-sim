@@ -32,13 +32,17 @@ class NoSlipBoundaryConditions(BoundaryConditions):
 
     def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
         fluid_state_matrix = fluid_state.fluid_state
-        affected_fluid_matrix = fluid_state_matrix[self.affected_cells, :]
-        fluid_state_matrix[self.affected_cells, :] = 0
+        affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
+        fluid_state_matrix[self.affected_cells] = 0
+
+        print(affected_fluid_matrix.shape)
+
+        # TODO: Debug this @Rafał
 
         # TODO: Verify that this is correct @Rafał
         for i, dr in enumerate(self.allowed_velocities):
-            dx, dy, dz = dr
-            fluid_state_matrix[self.affected_cells, :] += np.roll(affected_fluid_matrix[i], (dx, dy, dz), axis=(0, 1, 2))
+            dx, dy, dz = dr.astype(np.int32)
+            fluid_state_matrix[..., i] += np.roll(affected_fluid_matrix[i], (dx, dy, dz), axis=(0, 1, 2))
             
 
 class ConstantVelocityBoundaryConditions(BoundaryConditions):
@@ -55,5 +59,5 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         self._update_affected_cells(boundary_condition_delta.boundary_cube)
         self._update_velocities(boundary_condition_delta)
 
-    def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
+    def process_fluid_state(self, _: BoltzmannFluidState) -> None:
         raise NotImplementedError()

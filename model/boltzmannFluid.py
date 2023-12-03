@@ -41,7 +41,7 @@ class BoltzmannFluid:
     def simulation_step(self):
         density_state = FluidDensityState.from_boltzmann_state(self._fluid_state)
         velocity_state = FluidVelocityState.from_boltzmann_state(self._fluid_state, density_state)
-        equilibrium_state = EquilibriumFluidState.from_velocities_and_densities(velocity_state, density_state,
+        equilibrium_state = EquilibriumFluidState.from_velocities_and_densities(density_state, velocity_state,
                                                                                 self._equilibrium_weights,
                                                                                 self._directions, self._simulation_params)
         relaxed_state = RelaxedBoltzmannFluidState(self._fluid_state, equilibrium_state, self._simulation_params)

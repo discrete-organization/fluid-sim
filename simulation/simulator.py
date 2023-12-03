@@ -57,12 +57,12 @@ class Simulator:
                 self._running = False
 
     def _simulation_step(self) -> None:
-        # TODO: simulation step
+        self._fluid.simulation_step()
         self._simulation_steps_count += 1
 
 
     def _pygame_render(self) -> None:
-        self.window.fill((0, 0, 0))
+        self.window.fill(self.constants.BLACK)
         self._fluid_renderer.render_fluid(self._fluid)
 
     def _pygame_loop(self) -> None:

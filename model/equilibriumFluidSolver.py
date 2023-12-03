@@ -31,7 +31,7 @@ class EquilibriumFluidState:
         speed_of_sound_fourth = speed_of_sound_squared ** 2
 
         # TODO: Verify that this is correct @Rafał
-        u_dot_products = np.einsum("ijkv,ijkv->ijk", velocity.velocity_state, allowed_velocities)
+        u_dot_products = np.einsum("ijkv,ijkv->ijk", velocity.velocity_state, velocity.velocity_state)[:, :, :, np.newaxis]
         u_e_dot_products = np.einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities)
         u_e_dot_products_squared = u_e_dot_products ** 2
         u_dot_products_squared = u_dot_products ** 2
@@ -65,7 +65,7 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
 
     def __init__(self, fluid_state: BoltzmannFluidState, equilibrium_state: EquilibriumFluidState,
                  simulation_parameters: SimulationParameters) -> None:
-        self.fluid_state = self._relax_fluid_state(fluid_state.fluid_state, equilibrium_state,
+        self.fluid_state = self._relax_fluid_state(fluid_state.fluid_state, equilibrium_state.equilibrium_state,
                                                    simulation_parameters.relaxation_time)
         self.allowed_velocities = fluid_state.allowed_velocities
 
@@ -73,7 +73,7 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
         new_state = np.zeros_like(self.fluid_state)
 
         for i, dr in enumerate(self.allowed_velocities):
-            dx, dy, dz = dr # TODO: Verify that this is correct @Rafał
+            dx, dy, dz = dr.astype(np.int32) # TODO: Verify that this is correct @Rafał
             new_state[:, :, :, i] = np.roll(self.fluid_state[:, :, :, i], shift=(dx, dy, dz), axis=(0, 1, 2))            
 
         return BoltzmannFluidState(new_state.shape[:-1], self.allowed_velocities)
