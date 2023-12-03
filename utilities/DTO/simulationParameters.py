@@ -7,3 +7,4 @@ class SimulationParameters:
     time_delta: float
     cell_length: float
     speed_of_sound: float
+    relaxation_time: float

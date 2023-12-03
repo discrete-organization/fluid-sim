@@ -33,6 +33,7 @@ class Simulator:
         self._simulation_steps_count = 0
         self._fluid_renderer = FluidRenderer()
 
+
     def _process_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -41,6 +42,7 @@ class Simulator:
     def _simulation_step(self) -> None:
         # TODO: simulation step
         self._simulation_steps_count += 1
+
 
     def _pygame_render(self) -> None:
         self._screen.fill((0, 0, 0))
