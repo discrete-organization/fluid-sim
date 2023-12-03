@@ -1,18 +1,17 @@
 import numpy as np
 import pygame
+from model.boltzmannFluidUtils import FluidDensityState, FluidVelocityState
 from model.boltzmannFluid import BoltzmannFluid
-from model.boltzmannFluidState import FluidDensityState, FluidVelocityState
-from simulation import constantsDTO
+from .windowDTO import WindowProperties
 
 
 class FluidRenderer:
-    def __init__(self, window: pygame.Surface, constants: constantsDTO) -> None:
+    def __init__(self, window: pygame.Surface, constants: WindowProperties) -> None:
         self._window = window
         self._constants = constants
 
     def render_fluid(self, fluid: BoltzmannFluid) -> None:
-        self._constants = constantsDTO()
-        chosen_z = self._velocity_matrix.shape[2] // 2
+        self._constants = WindowProperties()
         # take velocity matrix from BoltzmanFluidState
         # matrix of velocities = [x, y, z, (v_x, v_y, v_z)]
         # change matrix to transection matrix - set constant z
@@ -24,6 +23,7 @@ class FluidRenderer:
         fluid_velocity_state = FluidVelocityState.from_boltzmann_state(fluid._fluid_state, fluid_density_state)
         self._velocity_matrix = fluid_velocity_state.velocity_state
         
+        chosen_z = self._velocity_matrix.shape[2] // 2
         self._density_matrix = self._density_matrix[:, :, chosen_z]
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
         
@@ -47,4 +47,4 @@ class FluidRenderer:
         x = i * cell_size
         y = j * cell_size
         rect = pygame.Rect(x, y, cell_size, cell_size)
-        # pygame.draw.rect(win, color, rect)
+        pygame.draw.rect(self._window, color, rect)

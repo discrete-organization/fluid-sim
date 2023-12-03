@@ -1,12 +1,5 @@
 import numpy as np
 from utilities.DTO.boundaryConditionDTO import BoundaryConditionInitialDelta
-from utilities.DTO.simulationParameters import SimulationParameters
-from .equilibriumFluidState import EquilibriumFluidState
-from .boundaryConditions import (
-    BoundaryConditions,
-    NoSlipBoundaryCondition,
-    ConstantVelocityBoundaryConditions
-)
 
 
 class BoltzmannFluidState:
@@ -20,30 +13,6 @@ class BoltzmannFluidState:
         x2, y2, z2 = fluid_initial_delta.boundary_cube.end_position.to_tuple()
         self.fluid_state[x1:x2, y1:y2, z1:z2] = fluid_initial_delta.boltzmann_f19.vectors
 
-
-class RelaxedBoltzmannFluidState(BoltzmannFluidState):
-    @staticmethod
-    def _relax_fluid_state(fluid_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
-                           equilibrium_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
-                           relaxation_time: float) \
-        -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
-
-        return fluid_state - (fluid_state - equilibrium_state) / relaxation_time
-
-    def __init__(self, fluid_state: BoltzmannFluidState, equilibrium_state: EquilibriumFluidState,
-                 simulation_parameters: SimulationParameters) -> None:
-        self.fluid_state = self._relax_fluid_state(fluid_state.fluid_state, equilibrium_state,
-                                                   simulation_parameters.relaxation_time)
-        self.allowed_velocities = fluid_state.allowed_velocities
-
-    def to_next_boltzmann_state(self) -> BoltzmannFluidState:
-        new_state = np.zeros_like(self.fluid_state)
-
-        for i, dr in enumerate(self.allowed_velocities):
-            dx, dy, dz = dr # TODO: Verify that this is correct @Rafał
-            new_state[:, :, :, i] = np.roll(self.fluid_state[:, :, :, i], shift=(dx, dy, dz), axis=(0, 1, 2))            
-
-        return BoltzmannFluidState(new_state.shape[:-1], self.allowed_velocities)
 
 class FluidDensityState:
     def __init__(self, density_state: np.ndarray[np.float64]) -> None:
@@ -83,4 +52,4 @@ class FluidVelocityState:
         velocities = np.einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities)
         # TODO: Verify that this is correct @Rafał
 
-        return FluidVelocityState(velocities) / np.nan_to_num(density_state.density_state, nan=1.0)[..., np.newaxis]
+        return FluidVelocityState(velocities / np.nan_to_num(density_state.density_state, nan=1.0)[..., np.newaxis])

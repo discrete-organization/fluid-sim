@@ -4,7 +4,7 @@ from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionConstantVelocityDelta,
     BoundaryCube
 )
-from .boltzmannFluidState import BolzmannFluidState
+from .boltzmannFluidUtils import BoltzmannFluidState
 
 
 class BoundaryConditions:
@@ -18,19 +18,19 @@ class BoundaryConditions:
         self.affected_cells = np.zeros(shape, dtype=bool)
         self.allowed_velocities = allowed_velocities
 
-    def process_fluid_state(self, _: BolzmannFluidState) -> None:
+    def process_fluid_state(self, _: BoltzmannFluidState) -> None:
         pass
         
 
 
 class NoSlipBoundaryConditions(BoundaryConditions):
-    def __init__(self, shape):
-        super().__init__(shape)
+    def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
+        super().__init__(shape, allowed_velocities)
 
     def update_boundary(self, boundary_condition_delta: BoundaryConditionNoSlipDelta) -> None:
         self._update_affected_cells(boundary_condition_delta.boundary_cube)
 
-    def process_fluid_state(self, fluid_state: BolzmannFluidState) -> None:
+    def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
         fluid_state_matrix = fluid_state.fluid_state
         affected_fluid_matrix = fluid_state_matrix[self.affected_cells, :]
         fluid_state_matrix[self.affected_cells, :] = 0
@@ -47,13 +47,13 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         x2, y2, z2 = boundary_condition_delta.boundary_cube.end_position.to_tuple()
         self.velocity[x1:x2, y1:y2, z1:z2] = boundary_condition_delta.velocity.to_tuple()
 
-    def __init__(self, shape):
-        super().__init__(shape)
+    def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
+        super().__init__(shape, allowed_velocities)
         self.velocity = np.zeros(shape + (3,))
 
     def update_boundary(self, boundary_condition_delta: BoundaryConditionConstantVelocityDelta) -> None:
         self._update_affected_cells(boundary_condition_delta.boundary_cube)
         self._update_velocities(boundary_condition_delta)
 
-    def process_fluid_state(self, fluid_state: BolzmannFluidState) -> None:
+    def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
         raise NotImplementedError()

@@ -1,4 +1,6 @@
 import pygame
+
+from simulation.windowDTO import WindowProperties
 from .fluidRenderer import FluidRenderer
 from utilities.argsReader import ArgsReader
 from utilities.modelConfigReader import ModelConfigReader
@@ -25,7 +27,8 @@ class Simulator:
 
     def _init_fluid(self) -> None:
         lattice_shape = self._model_config_reader.lattice_dimensions()
-        self._fluid = BoltzmannFluid(lattice_shape.to_tuple())
+        simulation_parameters = self._model_config_reader.simulation_parameters()
+        self._fluid = BoltzmannFluid(lattice_shape.to_tuple(), simulation_parameters)
         for boundary_condition_delta in self._model_config_reader.boundary_conditions():
             match boundary_condition_delta:
                 case BoundaryConditionNoSlipDelta() as no_slip_boundary_condition_delta:
@@ -39,8 +42,9 @@ class Simulator:
 
     def _pygame_init(self) -> None:
         pygame.init()
-
-        self.window = pygame.display.set_mode((1280, 720))
+        pygame.display.set_caption("Fluid simulation")
+        self.constants = WindowProperties()
+        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H))
         self._clock = pygame.time.Clock()
         self._running = True
         self._simulation_steps_count = 0

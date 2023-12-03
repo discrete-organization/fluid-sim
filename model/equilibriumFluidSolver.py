@@ -1,7 +1,8 @@
 import numpy as np
-from .boltzmannFluidState import (
+from .boltzmannFluidUtils import (
     FluidVelocityState,
-    FluidDensityState
+    FluidDensityState,
+    BoltzmannFluidState
 )
 from utilities.DTO.simulationParameters import SimulationParameters
 
@@ -51,3 +52,28 @@ class EquilibriumFluidState:
         result_field = np.einsum("ijk,ijkv->ijkv", density.density_state, velocity_coefficient_weighted)
 
         return EquilibriumFluidState(result_field)
+
+
+class RelaxedBoltzmannFluidState(BoltzmannFluidState):
+    @staticmethod
+    def _relax_fluid_state(fluid_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
+                           equilibrium_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
+                           relaxation_time: float) \
+        -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
+
+        return fluid_state - (fluid_state - equilibrium_state) / relaxation_time
+
+    def __init__(self, fluid_state: BoltzmannFluidState, equilibrium_state: EquilibriumFluidState,
+                 simulation_parameters: SimulationParameters) -> None:
+        self.fluid_state = self._relax_fluid_state(fluid_state.fluid_state, equilibrium_state,
+                                                   simulation_parameters.relaxation_time)
+        self.allowed_velocities = fluid_state.allowed_velocities
+
+    def to_next_boltzmann_state(self) -> BoltzmannFluidState:
+        new_state = np.zeros_like(self.fluid_state)
+
+        for i, dr in enumerate(self.allowed_velocities):
+            dx, dy, dz = dr # TODO: Verify that this is correct @Rafał
+            new_state[:, :, :, i] = np.roll(self.fluid_state[:, :, :, i], shift=(dx, dy, dz), axis=(0, 1, 2))            
+
+        return BoltzmannFluidState(new_state.shape[:-1], self.allowed_velocities)

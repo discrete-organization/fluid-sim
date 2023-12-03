@@ -1,13 +1,12 @@
 from typing import Tuple
 from .fluidDirectionProvider import FluidDirectionProvider
-from .boltzmannFluidState import (
+from .boltzmannFluidUtils import (
     BoltzmannFluidState,
-    RelaxedBoltzmannFluidState,
     FluidDensityState,
     FluidVelocityState
 )
 from .boundaryConditions import NoSlipBoundaryConditions, ConstantVelocityBoundaryConditions
-from .equilibriumFluidState import EquilibriumFluidState, EquilibriumWeights
+from .equilibriumFluidSolver import EquilibriumFluidState, EquilibriumWeights, RelaxedBoltzmannFluidState
 from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionNoSlipDelta,
     BoundaryConditionConstantVelocityDelta,
@@ -24,8 +23,9 @@ class BoltzmannFluid:
         self._directions = FluidDirectionProvider.get_all_directions()
         self._normalized_directions = FluidDirectionProvider.normalize_directions(self._directions)
         self._fluid_state = BoltzmannFluidState(lattice_dimensions, self._directions) # Verify this is correct @Rafał
-        self._no_slip_boundary_conditions = NoSlipBoundaryConditions(lattice_dimensions)
-        self._constant_velocity_boundary_conditions = ConstantVelocityBoundaryConditions(lattice_dimensions)
+        self._no_slip_boundary_conditions = NoSlipBoundaryConditions(lattice_dimensions, self._directions)
+        self._constant_velocity_boundary_conditions = ConstantVelocityBoundaryConditions(lattice_dimensions,
+                                                                                         self._directions)
         self._equilibrium_weights = EquilibriumWeights()
         self._simulation_params = simulation_params
 
