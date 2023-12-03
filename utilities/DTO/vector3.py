@@ -13,7 +13,7 @@ class Vector3Int:
             raise ValueError(f"vector must be of type int32, but is {vector.dtype}")
 
     def __init__(self, x: int, y: int, z: int) -> None:
-        self._vector = np.array([x, y, z])
+        self._vector = np.array([np.int32(x), np.int32(y), np.int32(z)])
         Vector3Int._check_vector(self._vector)
 
     @staticmethod

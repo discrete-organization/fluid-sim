@@ -10,10 +10,13 @@ from utilities.DTO.boundaryConditionDTO import (
 
 
 class BoltzmannFluid:
+    '''
+    One BoltzmannFluid object represents one frame in the fluid simulation.
+    '''
     def __init__(self, lattice_dimensions: Tuple[int, int, int]):
         self._directions = FluidDirectionProvider.get_all_directions()
         self._normalized_directions = FluidDirectionProvider.normalize_directions(self._directions)
-        self._fluid_state = BoltzmannFluidState(lattice_dimensions)
+        self._fluid_state = BoltzmannFluidState(lattice_dimensions, self._directions) # Verify this is correct @Rafał
         self._no_slip_boundary_conditions = NoSlipBoundaryConditions(lattice_dimensions)
         self._constant_velocity_boundary_conditions = ConstantVelocityBoundaryConditions(lattice_dimensions)
 

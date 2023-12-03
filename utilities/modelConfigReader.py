@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from typing import Generator
 from utilities.DTO.D3Q19 import D3Q19ParticleFunction
 from utilities.DTO.vector3 import Vector3Int, Vector3Float
@@ -56,9 +57,9 @@ class ModelConfigReader:
 
     def lattice_dimensions(self) -> Vector3Int:
         box_config_json = self._json_content["fluid_box"]
-        width = int(box_config_json["width"])
-        height = int(box_config_json["height"])
-        depth = int(box_config_json["depth"])
+        width = np.int32(box_config_json["width"])
+        height = np.int32(box_config_json["height"])
+        depth = np.int32(box_config_json["depth"])
 
         return Vector3Int(width, height, depth)
 

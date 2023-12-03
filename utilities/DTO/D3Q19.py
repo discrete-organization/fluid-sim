@@ -13,7 +13,7 @@ class D3Q19ParticleFunction:
         self.vectors = np.array(self.vectors)
 
         if self.vectors.shape != (19,):
-            raise ValueError("vectors must be a 19 matrix.")
+            raise ValueError("vectors must be a 19 sized matrix.")
         
         if self.vectors.dtype != np.float64:
             raise ValueError("vectors must be of type float64.")
