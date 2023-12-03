@@ -4,6 +4,7 @@ from utilities.DTO.boundaryConditionDTO import (
     BoundaryConditionConstantVelocityDelta,
     BoundaryCube
 )
+from .boltzmannFluidState import BolzmannFluidState
 
 
 class BoundaryConditions:
@@ -13,8 +14,13 @@ class BoundaryConditions:
 
         self.affected_cells[x1:x2, y1:y2, z1:z2] = True
 
-    def __init__(self, shape):
+    def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
         self.affected_cells = np.zeros(shape, dtype=bool)
+        self.allowed_velocities = allowed_velocities
+
+    def process_fluid_state(self, _: BolzmannFluidState) -> None:
+        pass
+        
 
 
 class NoSlipBoundaryConditions(BoundaryConditions):
@@ -24,6 +30,16 @@ class NoSlipBoundaryConditions(BoundaryConditions):
     def update_boundary(self, boundary_condition_delta: BoundaryConditionNoSlipDelta) -> None:
         self._update_affected_cells(boundary_condition_delta.boundary_cube)
 
+    def process_fluid_state(self, fluid_state: BolzmannFluidState) -> None:
+        fluid_state_matrix = fluid_state.fluid_state
+        affected_fluid_matrix = fluid_state_matrix[self.affected_cells, :]
+        fluid_state_matrix[self.affected_cells, :] = 0
+
+        # TODO: Verify that this is correct @Rafał
+        for i, dr in enumerate(self.allowed_velocities):
+            dx, dy, dz = dr
+            fluid_state_matrix[self.affected_cells, :] += np.roll(affected_fluid_matrix[i], (dx, dy, dz), axis=(0, 1, 2))
+            
 
 class ConstantVelocityBoundaryConditions(BoundaryConditions):
     def _update_velocities(self, boundary_condition_delta: BoundaryConditionConstantVelocityDelta) -> None:
@@ -39,3 +55,5 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         self._update_affected_cells(boundary_condition_delta.boundary_cube)
         self._update_velocities(boundary_condition_delta)
 
+    def process_fluid_state(self, fluid_state: BolzmannFluidState) -> None:
+        raise NotImplementedError()

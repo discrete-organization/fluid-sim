@@ -1,23 +1,35 @@
 import numpy as np
 import pygame
 from model.boltzmannFluid import BoltzmannFluid
+from model.boltzmannFluidState import FluidDensityState, FluidVelocityState
+from simulation import constantsDTO
 
 
 class FluidRenderer:
+    def __init__(self, window: pygame.Surface, constants: constantsDTO) -> None:
+        self._window = window
+        self._constants = constants
+
     def render_fluid(self, fluid: BoltzmannFluid) -> None:
+        self._constants = constantsDTO()
+        chosen_z = self._velocity_matrix.shape[2] // 2
         # take velocity matrix from BoltzmanFluidState
         # matrix of velocities = [x, y, z, (v_x, v_y, v_z)]
         # change matrix to transection matrix - set constant z
         # for each cell in transection matrix
         #   calculate color based on velocity
         #   draw rectangle with color
+        fluid_density_state: FluidDensityState = FluidDensityState.from_boltzmann_state(fluid._fluid_state)
+        self._density_matrix = fluid_density_state.density_state
+        fluid_velocity_state = FluidVelocityState.from_boltzmann_state(fluid._fluid_state, fluid_density_state)
+        self._velocity_matrix = fluid_velocity_state.velocity_state
         
-        self._velocity_matrix: np.array = fluid._fluid_state.fluid_state
-        helf_depth_ = self._velocity_matrix.shape[2] // 2
-        self._velocity_matrix = self._velocity_matrix[:, :, helf_depth_, :]
+        self._density_matrix = self._density_matrix[:, :, chosen_z]
+        self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
         
-        for i in range(self._velocity_matrix.shape[0]):
-            for j in range(self._velocity_matrix.shape[1]):
+        
+        for i in range(self._density_matrix.shape[0]):
+            for j in range(self._density_matrix.shape[1]):
                 self._draw_cell(i, j)
 
     def _draw_cell(self, i: int, j: int) -> None:
@@ -32,7 +44,6 @@ class FluidRenderer:
 
     def _draw_rectangle(self, i, j, color):
         cell_size = 1280 // self._velocity_matrix.shape[0]
-        # calculate the position and size of the rectangle
         x = i * cell_size
         y = j * cell_size
         rect = pygame.Rect(x, y, cell_size, cell_size)

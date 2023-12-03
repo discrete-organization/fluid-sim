@@ -11,6 +11,18 @@ from utilities.DTO.boundaryConditionDTO import (
 
 
 class Simulator:   
+    def __init__(self):
+        self._simulation_steps_count = 0
+        self._simulation_args = ArgsReader.read_args()
+        self._model_config_reader = ModelConfigReader(self._simulation_args.config_path)
+
+    def run(self) -> None:
+        self._init_fluid()
+        self._pygame_init()
+        self._pygame_loop()
+        self._pygame_quit()
+
+
     def _init_fluid(self) -> None:
         lattice_shape = self._model_config_reader.lattice_dimensions()
         self._fluid = BoltzmannFluid(lattice_shape.to_tuple())
@@ -27,11 +39,12 @@ class Simulator:
 
     def _pygame_init(self) -> None:
         pygame.init()
-        self._screen = pygame.display.set_mode((1280, 720))
+
+        self.window = pygame.display.set_mode((1280, 720))
         self._clock = pygame.time.Clock()
         self._running = True
         self._simulation_steps_count = 0
-        self._fluid_renderer = FluidRenderer()
+        self._fluid_renderer = FluidRenderer(self.window, self.constants)
 
 
     def _process_events(self) -> None:
@@ -45,7 +58,7 @@ class Simulator:
 
 
     def _pygame_render(self) -> None:
-        self._screen.fill((0, 0, 0))
+        self.window.fill((0, 0, 0))
         self._fluid_renderer.render_fluid(self._fluid)
 
     def _pygame_loop(self) -> None:
@@ -61,13 +74,3 @@ class Simulator:
         self._running = False
         pygame.quit()
 
-    def __init__(self):
-        self._simulation_steps_count = 0
-        self._simulation_args = ArgsReader.read_args()
-        self._model_config_reader = ModelConfigReader(self._simulation_args.config_path)
-
-    def run(self) -> None:
-        self._init_fluid()
-        self._pygame_init()
-        self._pygame_loop()
-        self._pygame_quit()

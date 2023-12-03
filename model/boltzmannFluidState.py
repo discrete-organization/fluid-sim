@@ -2,10 +2,15 @@ import numpy as np
 from utilities.DTO.boundaryConditionDTO import BoundaryConditionInitialDelta
 from utilities.DTO.simulationParameters import SimulationParameters
 from .equilibriumFluidState import EquilibriumFluidState
+from .boundaryConditions import (
+    BoundaryConditions,
+    NoSlipBoundaryCondition,
+    ConstantVelocityBoundaryConditions
+)
 
 
 class BoltzmannFluidState:
-    def __init__(self, shape, allowed_velocities: np.ndarray[np.ndarray[np.float64]]):
+    def __init__(self, shape, allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
         # Make sure that the allowed velocities have correct lengths (c e)
         self.fluid_state: np.array = np.zeros(shape + (19,))
         self.allowed_velocities = allowed_velocities
@@ -31,6 +36,14 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
                                                    simulation_parameters.relaxation_time)
         self.allowed_velocities = fluid_state.allowed_velocities
 
+    def to_next_boltzmann_state(self) -> BoltzmannFluidState:
+        new_state = np.zeros_like(self.fluid_state)
+
+        for i, dr in enumerate(self.allowed_velocities):
+            dx, dy, dz = dr # TODO: Verify that this is correct @Rafał
+            new_state[:, :, :, i] = np.roll(self.fluid_state[:, :, :, i], shift=(dx, dy, dz), axis=(0, 1, 2))            
+
+        return BoltzmannFluidState(new_state.shape[:-1], self.allowed_velocities)
 
 class FluidDensityState:
     def __init__(self, density_state: np.ndarray[np.float64]) -> None:
