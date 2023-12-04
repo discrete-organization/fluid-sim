@@ -45,6 +45,7 @@ class EquilibriumFluidState:
 
         velocity_coefficient = first_element + second_element + third_element + fourth_element
 
+        print(velocity_coefficient.shape)
         velocity_coefficient_weighted = np.einsum("ijkv,v->ijkv",
                                                   velocity_coefficient,
                                                   equilibrium_weights.weights)
