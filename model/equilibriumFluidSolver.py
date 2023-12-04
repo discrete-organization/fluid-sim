@@ -39,8 +39,8 @@ class EquilibriumFluidState:
         # TODO: Verify if the components of u_dot will be added correctly @Rafał
 
         first_element = 1
-        second_element = 3 * u_dot_products / speed_of_sound_squared
-        third_element = 9 * u_e_dot_products_squared / (2 * speed_of_sound_fourth)
+        second_element = 3 * u_dot_products / speed_of_sound
+        third_element = 9 * u_e_dot_products_squared / (2 * speed_of_sound_squared)
         fourth_element = -3 * u_dot_products_squared / (2 * speed_of_sound_squared)
 
         velocity_coefficient = first_element + second_element + third_element + fourth_element
@@ -60,7 +60,7 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
     def _relax_fluid_state(fluid_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
                            equilibrium_state: np.ndarray[np.ndarray[np.ndarray[np.float32]]],
                            relaxation_time: float) \
-        -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
+            -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
 
         print("Relaxing")
         print(fluid_state.sum())

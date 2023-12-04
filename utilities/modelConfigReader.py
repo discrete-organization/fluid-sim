@@ -73,7 +73,7 @@ class ModelConfigReader:
         print(f"Relaxation time: {relaxation_time}")
 
         # TODO: check this calculation @Rafał
-        speed_of_sound = cell_length / time_delta * 3 ** 0.5
+        speed_of_sound = cell_length / time_delta# * 3 ** 0.5
         print(f"Speed of sound: {speed_of_sound}")
 
         return SimulationParameters(viscosity, time_delta, cell_length, speed_of_sound, relaxation_time)

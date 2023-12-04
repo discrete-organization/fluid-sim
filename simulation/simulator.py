@@ -45,12 +45,11 @@ class Simulator:
         self.constants = WindowProperties()
         info = pygame.display.Info()
         self.constants.WIN_W, self.constants.WIN_H = info.current_w, info.current_h
-        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H), pygame.FULLSCREEN)
+        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H))
         self._clock = pygame.time.Clock()
         self._running = True
         self._simulation_steps_count = 0
         self._fluid_renderer = FluidRenderer(self.window, self.constants)
-
 
     def _process_events(self) -> None:
         for event in pygame.event.get():
@@ -61,7 +60,6 @@ class Simulator:
         self._fluid.simulation_step()
         self._simulation_steps_count += 1
         print(f"Simulation step: {self._simulation_steps_count}")
-
 
     def _pygame_render(self) -> None:
         self.window.fill(self.constants.BLACK)

@@ -1,5 +1,6 @@
 import numpy as np
 from utilities.DTO.boundaryConditionDTO import BoundaryConditionInitialDelta
+from utilities.DTO.simulationParameters import SimulationParameters
 
 
 class BoltzmannFluidState:
@@ -36,7 +37,8 @@ class FluidVelocityState:
         self.velocity_state = velocity_state
 
     @staticmethod
-    def from_boltzmann_state(boltzmann_state: BoltzmannFluidState, density_state: FluidDensityState)\
+    def from_boltzmann_state(boltzmann_state: BoltzmannFluidState, density_state: FluidDensityState,
+                             simulation_config: SimulationParameters)\
             -> 'FluidVelocityState':
         allowed_velocities = boltzmann_state.allowed_velocities
         fluid_state = boltzmann_state.fluid_state
@@ -57,7 +59,8 @@ class FluidVelocityState:
             So we for each cell (at position ijk), we multiply the amount of fluid flowing in a direction (v) with the
             direction of the fluid flow (w) in that direction.
         '''
-        velocities = np.einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities)
+        velocities = np.einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities) \
+            * simulation_config.speed_of_sound
         # TODO: Verify that this is correct @Rafał
 
         density_matrix_copy = np.copy(density_state.density_state)

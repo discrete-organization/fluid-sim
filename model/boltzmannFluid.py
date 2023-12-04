@@ -42,10 +42,12 @@ class BoltzmannFluid:
         # print("Początek", self._fluid_state.fluid_state.sum())
 
         density_state = FluidDensityState.from_boltzmann_state(self._fluid_state)
-        velocity_state = FluidVelocityState.from_boltzmann_state(self._fluid_state, density_state)
+        velocity_state = FluidVelocityState.from_boltzmann_state(self._fluid_state, density_state,
+                                                                 self._simulation_params)
         equilibrium_state = EquilibriumFluidState.from_velocities_and_densities(density_state, velocity_state,
                                                                                 self._equilibrium_weights,
-                                                                                self._directions, self._simulation_params)
+                                                                                self._directions,
+                                                                                self._simulation_params)
         relaxed_state = RelaxedBoltzmannFluidState(self._fluid_state, equilibrium_state, self._simulation_params)
         self._fluid_state = relaxed_state.to_next_boltzmann_state()
 
