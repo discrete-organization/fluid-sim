@@ -49,7 +49,7 @@ class FluidRenderer:
     def _calculate_color(self, velocity_vector: np.ndarray[np.float64], speed_value: np.float64,
                          max_speed: np.float64) -> np.array:
         velocity_angle_part = (np.arctan2(velocity_vector[1], velocity_vector[0]) + np.pi) / (2 * np.pi)
-        color_from_hsv = colorsys.hsv_to_rgb(velocity_angle_part, speed_value / max_speed, 1)
+        color_from_hsv = colorsys.hsv_to_rgb(velocity_angle_part, 1, speed_value / max_speed)
         color_from_hsv = np.array(color_from_hsv) * 255
         return color_from_hsv.astype(int)
 

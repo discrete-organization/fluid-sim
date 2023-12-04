@@ -32,14 +32,14 @@ class EquilibriumFluidState:
 
         # TODO: Verify that this is correct @Rafał
         u_dot_products = np.einsum("ijkv,ijkv->ijk", velocity.velocity_state, velocity.velocity_state)[:, :, :, np.newaxis]
-        u_e_dot_products = np.einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities)
+        u_e_dot_products = np.einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities * speed_of_sound)
         u_e_dot_products_squared = u_e_dot_products ** 2
         u_dot_products_squared = u_dot_products ** 2
 
         # TODO: Verify if the components of u_dot will be added correctly @Rafał
 
         first_element = 1
-        second_element = 3 * u_dot_products / speed_of_sound
+        second_element = 3 * u_e_dot_products / speed_of_sound
         third_element = 9 * u_e_dot_products_squared / (2 * speed_of_sound_squared)
         fourth_element = -3 * u_dot_products_squared / (2 * speed_of_sound_squared)
 
