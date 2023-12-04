@@ -30,14 +30,14 @@ class FluidRenderer:
     def _draw_cell_density(self, i: int, j: int) -> None:
         max_density = np.max(self._density_matrix)
         density_value = (self._density_matrix[i, j] / max_density * 255 if max_density > 0 else self._density_matrix[i, j]).astype(int)
-        self._draw_rectangle(i, j, np.array([density_value, density_value, density_value]))      
+        print(self._calculate_color(density_value))
+        self._draw_rectangle(i, j, (density_value, density_value, density_value))      
 
 
     def _draw_cell_velocity(self, i: int, j: int) -> None:
         velocity_vector = self._velocity_matrix[i, j, :]
         speed_value = np.linalg.norm(velocity_vector)
         velocity_vector = velocity_vector / speed_value if speed_value > 0 else velocity_vector
-        
         self._draw_rectangle(i, j, self._calculate_color(velocity_vector))
 
     def _calculate_color(self, velocity_vector: np.ndarray[np.float64]) -> np.array:

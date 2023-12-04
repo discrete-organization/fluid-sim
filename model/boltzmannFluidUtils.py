@@ -13,6 +13,14 @@ class BoltzmannFluidState:
         x2, y2, z2 = fluid_initial_delta.boundary_cube.end_position.to_tuple()
         self.fluid_state[x1:x2, y1:y2, z1:z2] = fluid_initial_delta.boltzmann_f19.vectors
 
+    @staticmethod
+    def from_fluid_state(fluid_state_matrix: np.ndarray[np.ndarray[np.ndarray[np.float64]]],
+                         allowed_velocities: np.ndarray[np.ndarray[np.ndarray[np.int32]]]) -> 'BoltzmannFluidState':
+        fluid_state = BoltzmannFluidState(fluid_state_matrix.shape[:-1], allowed_velocities)
+        fluid_state.fluid_state = fluid_state_matrix
+
+        return fluid_state
+
 
 class FluidDensityState:
     def __init__(self, density_state: np.ndarray[np.float64]) -> None:

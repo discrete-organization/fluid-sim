@@ -24,7 +24,6 @@ class Simulator:
         self._pygame_loop()
         self._pygame_quit()
 
-
     def _init_fluid(self) -> None:
         lattice_shape = self._model_config_reader.lattice_dimensions()
         simulation_parameters = self._model_config_reader.simulation_parameters()
@@ -69,13 +68,17 @@ class Simulator:
         self._fluid_renderer.render_fluid(self._fluid)
 
     def _pygame_loop(self) -> None:
+        self._pygame_render()
+        pygame.display.flip()
+        self._clock.tick(1)
+
         while self._running:
             self._process_events()
             for _ in range(self._simulation_args.steps_per_frame):
                 self._simulation_step()
             self._pygame_render()
             pygame.display.flip()
-            self._clock.tick(60)
+            self._clock.tick(1)
 
     def _pygame_quit(self) -> None:
         self._running = False

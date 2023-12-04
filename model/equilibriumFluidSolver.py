@@ -74,6 +74,6 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
 
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = dr.astype(np.int32) # TODO: Verify that this is correct @Rafał
-            new_state[:, :, :, i] = np.roll(self.fluid_state[:, :, :, i], shift=(dx, dy, dz), axis=(0, 1, 2))            
+            new_state[..., i] = np.roll(self.fluid_state[..., i], shift=(dx, dy, dz), axis=(0, 1, 2))
 
-        return BoltzmannFluidState(new_state.shape[:-1], self.allowed_velocities)
+        return BoltzmannFluidState.from_fluid_state(new_state, self.allowed_velocities)
