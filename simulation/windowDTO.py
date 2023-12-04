@@ -1,11 +1,10 @@
-import numpy as np
 from dataclasses import dataclass
 
 @dataclass
 class WindowProperties:
     # Window size
-    WIN_W: int = 1920
-    WIN_H: int = 1080
+    WIN_W: int = 1280
+    WIN_H: int = 720
 
     # Colours
     BLACK = (0, 0, 0)

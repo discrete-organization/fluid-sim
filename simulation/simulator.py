@@ -44,7 +44,9 @@ class Simulator:
         pygame.init()
         pygame.display.set_caption("Fluid simulation")
         self.constants = WindowProperties()
-        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H))
+        info = pygame.display.Info()
+        self.constants.WIN_W, self.constants.WIN_H = info.current_w, info.current_h
+        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H), pygame.FULLSCREEN)
         self._clock = pygame.time.Clock()
         self._running = True
         self._simulation_steps_count = 0
@@ -59,6 +61,7 @@ class Simulator:
     def _simulation_step(self) -> None:
         self._fluid.simulation_step()
         self._simulation_steps_count += 1
+        print(f"Simulation step: {self._simulation_steps_count}")
 
 
     def _pygame_render(self) -> None:
