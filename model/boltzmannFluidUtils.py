@@ -52,4 +52,7 @@ class FluidVelocityState:
         velocities = np.einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities)
         # TODO: Verify that this is correct @Rafał
 
-        return FluidVelocityState(velocities / np.nan_to_num(density_state.density_state, nan=1.0)[..., np.newaxis])
+        density_matrix_copy = np.copy(density_state.density_state)
+        density_matrix_copy[density_matrix_copy == 0] = 1
+
+        return FluidVelocityState(velocities / density_matrix_copy[..., np.newaxis])

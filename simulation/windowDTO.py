@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class WindowProperties:
+    # Window size
     WIN_W: int = 1920
     WIN_H: int = 1080
 
@@ -15,3 +16,4 @@ class WindowProperties:
     ORANGE = (255, 165, 0)
     YELLOW = (255, 255, 0)
     PURPLE = (128, 0, 128)
+    PINK = (255, 192, 203)
