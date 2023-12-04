@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+import colorsys
 from model.boltzmannFluidUtils import FluidDensityState, FluidVelocityState
 from model.boltzmannFluid import BoltzmannFluid
 from .windowDTO import WindowProperties
@@ -23,10 +24,12 @@ class FluidRenderer:
         chosen_z = self._velocity_matrix.shape[2] // 2
         self._density_matrix = self._density_matrix[:, :, chosen_z]
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
+
+        max_speed = np.max(np.linalg.norm(self._velocity_matrix, axis=-1))
         
         for i in range(self._density_matrix.shape[0]):
             for j in range(self._density_matrix.shape[1]):
-                self._draw_cell_velocity(i, j)
+                self._draw_cell_velocity(i, j, max_speed)
 
     def _draw_cell_density(self, i: int, j: int) -> None:
         max_density = np.max(self._density_matrix)
@@ -37,14 +40,18 @@ class FluidRenderer:
         density_value = density_value.astype(int)
         self._draw_rectangle(i, j, (density_value, density_value, density_value))
 
-    def _draw_cell_velocity(self, i: int, j: int) -> None:
+    def _draw_cell_velocity(self, i: int, j: int, max_speed: np.float64) -> None:
         velocity_vector = self._velocity_matrix[i, j, :]
         speed_value = np.linalg.norm(velocity_vector)
         velocity_vector = velocity_vector / speed_value if speed_value > 0 else velocity_vector
-        self._draw_rectangle(i, j, self._calculate_color(velocity_vector))
+        self._draw_rectangle(i, j, self._calculate_color(velocity_vector, speed_value, max_speed))
 
-    def _calculate_color(self, velocity_vector: np.ndarray[np.float64]) -> np.array:
-        return ((velocity_vector + 1) * 127).astype(int)
+    def _calculate_color(self, velocity_vector: np.ndarray[np.float64], speed_value: np.float64,
+                         max_speed: np.float64) -> np.array:
+        velocity_angle_part = (np.arctan2(velocity_vector[1], velocity_vector[0]) + np.pi) / (2 * np.pi)
+        color_from_hsv = colorsys.hsv_to_rgb(velocity_angle_part, speed_value / max_speed, 1)
+        color_from_hsv = np.array(color_from_hsv) * 255
+        return color_from_hsv.astype(int)
 
     def _draw_rectangle(self, i: int, j: int, color: np.ndarray[int]) -> None:
         count_for_width = self._constants.WIN_W // self._velocity_matrix.shape[0]
