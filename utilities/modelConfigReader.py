@@ -70,6 +70,7 @@ class ModelConfigReader:
         cell_length = float(box_config_json["cell_length"])
 
         relaxation_time = (time_delta / cell_length ** 2 * 6 * viscosity + 1) / 2
+        print(f"Relaxation time: {relaxation_time}")
 
         # TODO: check this calculation @Rafał
         speed_of_sound = cell_length / time_delta * 3 ** 0.5

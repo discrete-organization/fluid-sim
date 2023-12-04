@@ -66,19 +66,17 @@ class Simulator:
     def _pygame_render(self) -> None:
         self.window.fill(self.constants.BLACK)
         self._fluid_renderer.render_fluid(self._fluid)
+        pygame.display.flip()
+        self._clock.tick(60)
 
     def _pygame_loop(self) -> None:
         self._pygame_render()
-        pygame.display.flip()
-        self._clock.tick(1)
 
         while self._running:
             self._process_events()
             for _ in range(self._simulation_args.steps_per_frame):
                 self._simulation_step()
             self._pygame_render()
-            pygame.display.flip()
-            self._clock.tick(1)
 
     def _pygame_quit(self) -> None:
         self._running = False

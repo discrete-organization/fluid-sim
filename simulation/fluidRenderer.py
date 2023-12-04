@@ -29,8 +29,11 @@ class FluidRenderer:
 
     def _draw_cell_density(self, i: int, j: int) -> None:
         max_density = np.max(self._density_matrix)
-        density_value = (self._density_matrix[i, j] / max_density * 255 if max_density > 0 else self._density_matrix[i, j]).astype(int)
-        print(self._calculate_color(density_value))
+        min_density = np.min(self._density_matrix)
+        density_value = self._density_matrix[i, j]
+        if max_density > min_density:
+            density_value = (self._density_matrix[i, j] - min_density) / (max_density - min_density) * 255
+        density_value = density_value.astype(int)
         self._draw_rectangle(i, j, (density_value, density_value, density_value))      
 
 

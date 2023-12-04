@@ -61,6 +61,9 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
                            relaxation_time: float) \
         -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
 
+        print("Relaxing")
+        print(fluid_state.sum())
+        print(equilibrium_state.sum())
         return fluid_state - (fluid_state - equilibrium_state) / relaxation_time
 
     def __init__(self, fluid_state: BoltzmannFluidState, equilibrium_state: EquilibriumFluidState,
