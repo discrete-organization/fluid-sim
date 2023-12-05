@@ -39,8 +39,6 @@ class BoltzmannFluid:
         self._fluid_state.update_fluid_initial_state(boundary_condition_delta)
 
     def simulation_step(self):
-        # print("Początek", self._fluid_state.fluid_state.sum())
-
         density_state = FluidDensityState.from_boltzmann_state(self._fluid_state)
         velocity_state = FluidVelocityState.from_boltzmann_state(self._fluid_state, density_state,
                                                                  self._simulation_params)

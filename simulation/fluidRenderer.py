@@ -26,6 +26,8 @@ class FluidRenderer:
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
 
         max_speed = np.max(np.linalg.norm(self._velocity_matrix, axis=-1))
+
+        print(max_speed)
         
         for i in range(self._density_matrix.shape[0]):
             for j in range(self._density_matrix.shape[1]):
@@ -49,8 +51,8 @@ class FluidRenderer:
     def _calculate_color(self, velocity_vector: np.ndarray[np.float64], speed_value: np.float64,
                          max_speed: np.float64) -> np.array:
         velocity_angle_part = (np.arctan2(velocity_vector[1], velocity_vector[0]) + np.pi) / (2 * np.pi)
-        color_from_hsv = colorsys.hsv_to_rgb(velocity_angle_part, 1, speed_value / max_speed)
-        color_from_hsv = np.array(color_from_hsv) * 255
+        color_from_hsv = colorsys.hsv_to_rgb(velocity_angle_part, 1, speed_value / max_speed if max_speed > 0 else 0)
+        color_from_hsv = np.minimum(np.array(color_from_hsv) * 255, 255)
         return color_from_hsv.astype(int)
 
     def _draw_rectangle(self, i: int, j: int, color: np.ndarray[int]) -> None:
