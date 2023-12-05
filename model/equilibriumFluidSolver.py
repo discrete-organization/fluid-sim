@@ -43,7 +43,6 @@ class EquilibriumFluidState:
 
         velocity_coefficient = first_element + second_element + third_element + fourth_element
 
-        print(equilibrium_weights.weights)
         velocity_coefficient_weighted = np.einsum("ijkv,v->ijkv",
                                                   velocity_coefficient,
                                                   equilibrium_weights.weights)
@@ -60,9 +59,6 @@ class RelaxedBoltzmannFluidState(BoltzmannFluidState):
                            relaxation_time: float) \
             -> np.ndarray[np.ndarray[np.ndarray[np.float32]]]:
 
-        print("Relaxing")
-        print(fluid_state.sum())
-        print(equilibrium_state.sum())
         return fluid_state - (fluid_state - equilibrium_state) / relaxation_time
 
     def __init__(self, fluid_state: BoltzmannFluidState, equilibrium_state: EquilibriumFluidState,

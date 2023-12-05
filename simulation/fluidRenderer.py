@@ -26,11 +26,10 @@ class FluidRenderer:
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
 
         max_speed = np.max(np.linalg.norm(self._velocity_matrix, axis=-1))
-
-        print(max_speed)
         
         for i in range(self._density_matrix.shape[0]):
             for j in range(self._density_matrix.shape[1]):
+                # self._draw_cell_density(i, j)
                 self._draw_cell_velocity(i, j, max_speed)
 
     def _draw_cell_density(self, i: int, j: int) -> None:
