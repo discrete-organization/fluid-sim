@@ -64,3 +64,19 @@ class FluidDirectionProvider:
         normalized_directions[1:] = directions[1:] / lengths[1:, None]
 
         return normalized_directions
+    
+    @staticmethod
+    def get_reverse_direction_index(direction_index: int) -> int:
+        if direction_index == 0:
+            return 0
+        if direction_index <= 6:
+            return direction_index - 1 if direction_index % 2 == 0 else direction_index + 1
+        index_from_7 = direction_index - 7
+        part = index_from_7 // 4
+        index_in_part = index_from_7 % 4
+
+        return 7 + part * 4 + 3 - index_in_part
+
+    @staticmethod
+    def get_reverse_directions_indices() -> np.ndarray[np.int32]:
+        return np.array([FluidDirectionProvider.get_reverse_direction_index(i) for i in range(19)])

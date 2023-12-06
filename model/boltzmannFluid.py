@@ -38,6 +38,10 @@ class BoltzmannFluid:
     def update_initial_boundary(self, boundary_condition_delta: BoundaryConditionInitialDelta):
         self._fluid_state.update_fluid_initial_state(boundary_condition_delta)
 
+    def prepare_boundary_conditions(self):
+        self._no_slip_boundary_conditions.remove_fluid_from_boundary(self._fluid_state)
+        self._constant_velocity_boundary_conditions.remove_fluid_from_boundary(self._fluid_state)
+
     def simulation_step(self):
         density_state = FluidDensityState.from_boltzmann_state(self._fluid_state)
         velocity_state = FluidVelocityState.from_boltzmann_state(self._fluid_state, density_state,
@@ -49,7 +53,7 @@ class BoltzmannFluid:
         relaxed_state = RelaxedBoltzmannFluidState(self._fluid_state, equilibrium_state, self._simulation_params)
         self._fluid_state = relaxed_state.to_next_boltzmann_state()
 
-        # print("Koniec", self._fluid_state.fluid_state.sum())
+        print("Koniec", self._fluid_state.fluid_state.sum())
 
-        # self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
+        self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
         # self._constant_velocity_boundary_conditions.process_fluid_state(self._fluid_state)

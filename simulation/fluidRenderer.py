@@ -14,7 +14,6 @@ class FluidRenderer:
                  simulation_args: SimulationArgs, draw_size: Tuple[int, int, int]) -> None:
         self._window = window
         self._constants = constants
-        self._draw_size = draw_size
         self._simulation_args = simulation_args
         self._output_writer = cv2.VideoWriter(simulation_args.output_path,
                                               cv2.VideoWriter_fourcc(*'mp4v'), 24,
@@ -26,6 +25,11 @@ class FluidRenderer:
         fluid_velocity_state = FluidVelocityState.from_boltzmann_state(fluid._fluid_state, fluid_density_state,
                                                                        fluid._simulation_params)
         self._velocity_matrix = fluid_velocity_state.velocity_state
+
+        self._not_no_slip_boundaries_mask = np.repeat(1 - fluid._no_slip_boundary_conditions.affected_cells, 3, axis=-1)\
+            .astype(np.uint8)
+        self._not_constant_velocity_boundaries_mask = np.repeat(1 - fluid._constant_velocity_boundary_conditions.affected_cells,
+                                                                3, axis=-1).astype(np.uint8)
         
         # TODO Create adjustable transection, modifiable with slider
         chosen_z = self._velocity_matrix.shape[2] // 2
@@ -45,6 +49,7 @@ class FluidRenderer:
             if max_density != min_density else np.zeros_like(self._density_matrix)
 
         rgb_colors_matrix = np.repeat(mapped_density[..., np.newaxis], 3, axis=-1).astype(np.uint8)
+        rgb_colors_matrix = self._apply_boundaries_masks(rgb_colors_matrix)
 
         self._draw_surface_from_matrix(rgb_colors_matrix)
         self._save_frame(rgb_colors_matrix)
@@ -66,9 +71,15 @@ class FluidRenderer:
             if max_speed != min_speed else np.zeros_like(speeds_matrix)
 
         rgb_colors_matrix = (colors.hsv_to_rgb(hsv_colors_matrix) * 255).astype(np.uint8)
+        rgb_colors_matrix = self._apply_boundaries_masks(rgb_colors_matrix)
 
         self._draw_surface_from_matrix(rgb_colors_matrix)
         self._save_frame(rgb_colors_matrix)
+
+    def _apply_boundaries_masks(self, matrix: np.ndarray) -> np.ndarray:
+        return matrix
+        return matrix * self._not_no_slip_boundaries_mask \
+            * self._not_constant_velocity_boundaries_mask
 
     def _draw_surface_from_matrix(self, matrix: np.ndarray[np.ndarray[np.ndarray[np.uint8]]]) -> None:
         if not self._simulation_args.draw_on_screen:
@@ -86,7 +97,7 @@ class FluidRenderer:
 
         scaled_x, scaled_y = int(current_x * scale_quotient), int(current_y * scale_quotient)
         scaled_surface = pygame.transform.scale(surface, (scaled_x, scaled_y))
-
+        
         self._window.blit(scaled_surface, (0, 0))
 
     def _save_frame(self, frame: np.ndarray) -> None:

@@ -1,4 +1,5 @@
 import pygame
+import os
 
 from simulation.windowDTO import WindowProperties
 from .fluidRenderer import FluidRenderer
@@ -17,6 +18,7 @@ class Simulator:
         self._simulation_steps_count = 0
         self._simulation_args = ArgsReader.read_args()
         self._model_config_reader = ModelConfigReader(self._simulation_args.config_path)
+        print(self._simulation_args)
 
     def run(self) -> None:
         self._init_fluid()
@@ -38,6 +40,7 @@ class Simulator:
                     self._fluid.update_initial_boundary(initial_boundary_condition_delta)
                 case _:
                     raise ValueError(f"Invalid boundary condition type: {type(boundary_condition_delta)}")
+        self._fluid.prepare_boundary_conditions()
 
     def _pygame_init(self) -> None:
         pygame.init()
@@ -52,6 +55,10 @@ class Simulator:
         self._fluid_renderer = FluidRenderer(self.window, self.constants, self._simulation_args,
                                              self._model_config_reader.lattice_dimensions().to_tuple())
 
+    def _prepare_output_directory(self) -> None:
+        if not os.path.exists(self._simulation_args.output_path):
+            os.makedirs(self._simulation_args.output_path)
+
     def _process_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -63,11 +70,13 @@ class Simulator:
         print(f"Simulation step: {self._simulation_steps_count}/{self._simulation_args.number_of_steps}")
 
     def _pygame_render(self) -> None:
+        if self._simulation_args.draw_on_screen:
+            self.window.fill(self.constants.BLACK)
+
         self._fluid_renderer.render_fluid(self._fluid)
 
         if not self._simulation_args.draw_on_screen:
             return
-        self.window.fill(self.constants.BLACK)
         pygame.display.flip()
         self._clock.tick(60)
 
@@ -76,7 +85,10 @@ class Simulator:
 
         while self._simulation_steps_count < self._simulation_args.number_of_steps and self._running:
             self._process_events()
-            for _ in range(self._simulation_args.steps_per_frame):
+
+            number_of_steps = min(self._simulation_args.steps_per_frame,
+                                  self._simulation_args.number_of_steps - self._simulation_steps_count)
+            for _ in range(number_of_steps):
                 self._simulation_step()
             self._pygame_render()
 

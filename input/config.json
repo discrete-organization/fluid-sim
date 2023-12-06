@@ -1,7 +1,7 @@
 {
     "fluid_box": {
-        "width": 200,
-        "height": 100,
+        "width": 400,
+        "height": 200,
         "depth": 1,
         "viscosity": 0.0002,
         "time_delta": 0.0125,
@@ -63,9 +63,9 @@
                 "x": 0,
                 "y": 0,
                 "z": 0,
-                "width": 200,
-                "height": 200,
-                "depth": 200
+                "width": 2000,
+                "height": 2000,
+                "depth": 2000
             },
             "data": {
                 "boltzmann_f19": [

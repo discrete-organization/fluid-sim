@@ -5,6 +5,7 @@ from utilities.DTO.boundaryConditionDTO import (
     BoundaryCube
 )
 from .boltzmannFluidUtils import BoltzmannFluidState
+from .fluidDirectionProvider import FluidDirectionProvider
 
 
 class BoundaryConditions:
@@ -17,9 +18,14 @@ class BoundaryConditions:
     def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
         self.affected_cells = np.zeros(shape, dtype=bool)
         self.allowed_velocities = allowed_velocities
+        self.reverse_direction_indeces = FluidDirectionProvider.get_reverse_directions_indices()
 
     def process_fluid_state(self, _: BoltzmannFluidState) -> None:
         pass
+
+    def remove_fluid_from_boundary(self, fluid_state: BoltzmannFluidState) -> None:
+        fluid_state_matrix = fluid_state.fluid_state
+        fluid_state_matrix[self.affected_cells, ...] = 0
         
 
 
@@ -37,8 +43,9 @@ class NoSlipBoundaryConditions(BoundaryConditions):
 
         # TODO: Verify that this is correct @Rafał
         for i, dr in enumerate(self.allowed_velocities):
-            dx, dy, dz = dr.astype(np.int32)
-            fluid_state_matrix[..., i] += np.roll(affected_fluid_matrix[..., i], (dx, dy, dz), axis=(0, 1, 2))
+            dx, dy, dz = -dr.astype(np.int32)
+            reverse_index = self.reverse_direction_indeces[i]
+            fluid_state_matrix[..., reverse_index] += np.roll(affected_fluid_matrix[..., i], (dx, dy, dz), axis=(0, 1, 2))
             
 
 class ConstantVelocityBoundaryConditions(BoundaryConditions):
