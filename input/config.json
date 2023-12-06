@@ -22,6 +22,58 @@
             }
         },
         {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "width": 1,
+                "height": 1000,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 399,
+                "y": 0,
+                "z": 0,
+                "width": 1,
+                "height": 1000,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "width": 1000,
+                "height": 1,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 0,
+                "y": 199,
+                "z": 0,
+                "width": 1000,
+                "height": 1,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
             "boundary_type": "constant-velocity",
             "cube": {
                 "x": 5,

@@ -53,7 +53,7 @@ class BoltzmannFluid:
         relaxed_state = RelaxedBoltzmannFluidState(self._fluid_state, equilibrium_state, self._simulation_params)
         self._fluid_state = relaxed_state.to_next_boltzmann_state()
 
-        print("Koniec", self._fluid_state.fluid_state.sum())
+        #print("Koniec", self._fluid_state.fluid_state.sum())
 
         self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
         # self._constant_velocity_boundary_conditions.process_fluid_state(self._fluid_state)
