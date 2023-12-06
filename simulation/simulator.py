@@ -42,10 +42,9 @@ class Simulator:
     def _pygame_init(self) -> None:
         pygame.init()
         pygame.display.set_caption("Fluid simulation")
-        self.constants = WindowProperties()
         info = pygame.display.Info()
-        # self.constants.WIN_W, self.constants.WIN_H = info.current_w, info.current_h
-        self.constants.WIN_W, self.constants.WIN_H = 1200, 1200
+        self.constants = WindowProperties(info.current_w, info.current_h)
+        # self.constants.WIN_W, self.constants.WIN_H = 1200, 1200
         self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H))
         self._clock = pygame.time.Clock()
         self._running = True

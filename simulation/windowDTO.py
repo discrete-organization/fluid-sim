@@ -3,8 +3,8 @@ from dataclasses import dataclass
 @dataclass
 class WindowProperties:
     # Window size
-    WIN_W: int = 1280
-    WIN_H: int = 720
+    WIN_W: int 
+    WIN_H: int
 
     # Colours
     BLACK = (0, 0, 0)

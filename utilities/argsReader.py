@@ -12,8 +12,8 @@ class ArgsReader:
     @staticmethod
     def read_args() -> SimulationArgs:
         parser = argparse.ArgumentParser()
-        parser.add_argument('--config', type=str, default='input/config.json')
-        parser.add_argument('--steps-per-frame', type=int, default='10')
+        parser.add_argument('--config', '-c', type=str, default='input/config.json')
+        parser.add_argument('--steps-per-frame', '-s', type=int, default='10')
 
         args = parser.parse_args()
 
