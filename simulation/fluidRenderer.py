@@ -1,15 +1,24 @@
 import numpy as np
 import pygame
+import cv2
+from typing import Tuple
 from matplotlib import colors
 from model.boltzmannFluidUtils import FluidDensityState, FluidVelocityState
 from model.boltzmannFluid import BoltzmannFluid
 from .windowDTO import WindowProperties
+from utilities.argsReader import SimulationArgs
 
 
 class FluidRenderer:
-    def __init__(self, window: pygame.Surface, constants: WindowProperties) -> None:
+    def __init__(self, window: pygame.Surface, constants: WindowProperties,
+                 simulation_args: SimulationArgs, draw_size: Tuple[int, int, int]) -> None:
         self._window = window
         self._constants = constants
+        self._draw_size = draw_size
+        self._simulation_args = simulation_args
+        self._output_writer = cv2.VideoWriter(simulation_args.output_path,
+                                              cv2.VideoWriter_fourcc(*'mp4v'), 24,
+                                              draw_size[:2], True)
 
     def render_fluid(self, fluid: BoltzmannFluid) -> None:
         fluid_density_state: FluidDensityState = FluidDensityState.from_boltzmann_state(fluid._fluid_state)
@@ -23,8 +32,10 @@ class FluidRenderer:
         self._density_matrix = self._density_matrix[:, :, chosen_z]
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
 
-        #self._draw_density()
-        self._draw_velocity()
+        if self._simulation_args.use_density:
+            self._draw_density()
+        else:
+            self._draw_velocity()
 
     def _draw_density(self):
         max_density = np.max(self._density_matrix)
@@ -33,10 +44,10 @@ class FluidRenderer:
         mapped_density = (self._density_matrix - min_density) / (max_density - min_density) * 255 \
             if max_density != min_density else np.zeros_like(self._density_matrix)
 
-        rgb_colors_matrix = np.repeat(mapped_density[..., np.newaxis], 3, axis=-1)
-        density_surface = pygame.surfarray.make_surface(rgb_colors_matrix)
+        rgb_colors_matrix = np.repeat(mapped_density[..., np.newaxis], 3, axis=-1).astype(np.uint8)
 
-        self._draw_surface(density_surface)
+        self._draw_surface_from_matrix(rgb_colors_matrix)
+        self._save_frame(rgb_colors_matrix)
 
     def _draw_velocity(self):
         speeds_matrix = np.linalg.norm(self._velocity_matrix, axis=-1)
@@ -54,11 +65,17 @@ class FluidRenderer:
         hsv_colors_matrix[..., 2] = (speeds_matrix - min_speed) / (max_speed - min_speed) \
             if max_speed != min_speed else np.zeros_like(speeds_matrix)
 
-        rgb_colors_matrix = colors.hsv_to_rgb(hsv_colors_matrix)
+        rgb_colors_matrix = (colors.hsv_to_rgb(hsv_colors_matrix) * 255).astype(np.uint8)
 
-        velocity_surface = pygame.surfarray.make_surface(rgb_colors_matrix * 255)
+        self._draw_surface_from_matrix(rgb_colors_matrix)
+        self._save_frame(rgb_colors_matrix)
 
-        self._draw_surface(velocity_surface)
+    def _draw_surface_from_matrix(self, matrix: np.ndarray[np.ndarray[np.ndarray[np.uint8]]]) -> None:
+        if not self._simulation_args.draw_on_screen:
+            return
+
+        surface = pygame.surfarray.make_surface(matrix)
+        self._draw_surface(surface)
     
     def _draw_surface(self, surface: pygame.SurfaceType) -> None:
         current_x, current_y = self._window.get_size()
@@ -72,3 +89,11 @@ class FluidRenderer:
 
         self._window.blit(scaled_surface, (0, 0))
 
+    def _save_frame(self, frame: np.ndarray) -> None:
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        frame_bgr_flipped = np.swapaxes(frame_bgr, 0, 1)
+        self._output_writer.write(frame_bgr_flipped)
+
+    def save_video(self):
+        self._output_writer.release()
+        print("Video saved")

@@ -44,12 +44,13 @@ class Simulator:
         pygame.display.set_caption("Fluid simulation")
         info = pygame.display.Info()
         self.constants = WindowProperties(info.current_w, info.current_h)
-        # self.constants.WIN_W, self.constants.WIN_H = 1200, 1200
-        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H))
+        self.window = pygame.display.set_mode((self.constants.WIN_W, self.constants.WIN_H)) \
+            if self._simulation_args.draw_on_screen else None
         self._clock = pygame.time.Clock()
         self._running = True
         self._simulation_steps_count = 0
-        self._fluid_renderer = FluidRenderer(self.window, self.constants)
+        self._fluid_renderer = FluidRenderer(self.window, self.constants, self._simulation_args,
+                                             self._model_config_reader.lattice_dimensions().to_tuple())
 
     def _process_events(self) -> None:
         for event in pygame.event.get():
@@ -59,22 +60,27 @@ class Simulator:
     def _simulation_step(self) -> None:
         self._fluid.simulation_step()
         self._simulation_steps_count += 1
-        print(f"Simulation step: {self._simulation_steps_count}")
+        print(f"Simulation step: {self._simulation_steps_count}/{self._simulation_args.number_of_steps}")
 
     def _pygame_render(self) -> None:
-        self.window.fill(self.constants.BLACK)
         self._fluid_renderer.render_fluid(self._fluid)
+
+        if not self._simulation_args.draw_on_screen:
+            return
+        self.window.fill(self.constants.BLACK)
         pygame.display.flip()
         self._clock.tick(60)
 
     def _pygame_loop(self) -> None:
         self._pygame_render()
 
-        while self._running:
+        while self._simulation_steps_count < self._simulation_args.number_of_steps and self._running:
             self._process_events()
             for _ in range(self._simulation_args.steps_per_frame):
                 self._simulation_step()
             self._pygame_render()
+
+        self._fluid_renderer.save_video()
 
     def _pygame_quit(self) -> None:
         self._running = False
