@@ -1,6 +1,7 @@
 import numpy as np
 from utilities.DTO.boundaryConditionDTO import BoundaryConditionInitialDelta
 from utilities.DTO.simulationParameters import SimulationParameters
+from einsumt import einsumt as einsum
 
 
 class BoltzmannFluidState:
@@ -49,7 +50,7 @@ class FluidVelocityState:
             
             The result should be of shape (w_x, w_y, w_z, 3)
             
-            We can achieve this by using np.einsum:
+            We can achieve this by using einsum:
             Let v to be the last axis of the fluid state (it specifies the amount of fluid flowing in a direction),
             and let w to be the last axis of the allowed velocities (it specifies the direction of the fluid flow).
             
@@ -59,7 +60,7 @@ class FluidVelocityState:
             So we for each cell (at position ijk), we multiply the amount of fluid flowing in a direction (v) with the
             direction of the fluid flow (w) in that direction.
         '''
-        velocities = np.einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities) \
+        velocities = einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities) \
             * simulation_config.speed_of_sound
         # TODO: Verify that this is correct @Rafał
 

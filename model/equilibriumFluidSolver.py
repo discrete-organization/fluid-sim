@@ -1,4 +1,5 @@
 import numpy as np
+from einsumt import einsumt as einsum
 from .boltzmannFluidUtils import (
     FluidVelocityState,
     FluidDensityState,
@@ -30,8 +31,8 @@ class EquilibriumFluidState:
         speed_of_sound_squared = speed_of_sound ** 2
 
         # TODO: Verify that this is correct @Rafał
-        u_dot_products = np.einsum("ijkv,ijkv->ijk", velocity.velocity_state, velocity.velocity_state)[:, :, :, np.newaxis]
-        u_e_dot_products = np.einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities)
+        u_dot_products = einsum("ijkv,ijkv->ijk", velocity.velocity_state, velocity.velocity_state)[:, :, :, np.newaxis]
+        u_e_dot_products = einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities)
         u_e_dot_products_squared = u_e_dot_products ** 2
 
         # TODO: Verify if the components of u_dot will be added correctly @Rafał
@@ -43,11 +44,11 @@ class EquilibriumFluidState:
 
         velocity_coefficient = first_element + second_element + third_element + fourth_element
 
-        velocity_coefficient_weighted = np.einsum("ijkv,v->ijkv",
+        velocity_coefficient_weighted = einsum("ijkv,v->ijkv",
                                                   velocity_coefficient,
                                                   equilibrium_weights.weights)
 
-        result_field = np.einsum("ijk,ijkv->ijkv", density.density_state, velocity_coefficient_weighted)
+        result_field = einsum("ijk,ijkv->ijkv", density.density_state, velocity_coefficient_weighted)
 
         return EquilibriumFluidState(result_field)
 
