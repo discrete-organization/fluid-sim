@@ -37,12 +37,10 @@ class EquilibriumFluidState:
 
         # TODO: Verify if the components of u_dot will be added correctly @Rafał
 
-        first_element = 1
-        second_element = 3 * u_e_dot_products / speed_of_sound
-        third_element = 9 * u_e_dot_products_squared / (2 * speed_of_sound_squared)
-        fourth_element = -3 * u_dot_products / (2 * speed_of_sound_squared)
-
-        velocity_coefficient = first_element + second_element + third_element + fourth_element
+        velocity_coefficient = 1
+        velocity_coefficient += 3 * u_e_dot_products / speed_of_sound
+        velocity_coefficient += 9 * u_e_dot_products_squared / (2 * speed_of_sound_squared)
+        velocity_coefficient += -3 * u_dot_products / (2 * speed_of_sound_squared)
 
         velocity_coefficient_weighted = einsum("ijkv,v->ijkv",
                                                velocity_coefficient,

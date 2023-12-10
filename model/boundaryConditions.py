@@ -65,4 +65,34 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         self._update_velocities(boundary_condition_delta)
 
     def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
-        pass
+        fluid_state_matrix = fluid_state.fluid_state
+        density_state_matrix = FluidDensityState.from_boltzmann_state(fluid_state).density_state
+        affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
+
+        density_state_matrix_third = density_state_matrix / 3
+        density_state_matrix_sixth = density_state_matrix / 6
+
+        sum_partial_coefficients = 1 - np.abs(np.inner(self.normal_vectors, self.allowed_velocities))
+
+        # TODO: Verify this THOROUGHLY @Rafał
+        for i, dr in enumerate(self.allowed_velocities):
+            dx, dy, dz = -dr.astype(np.int32)
+            reverse_index = self.reverse_direction_indeces[i]
+
+            # TODO: Verify that this is correct @Rafał (very important)
+            tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
+
+            ci_dot_velocity = np.inner(self.velocity, dr)
+
+            tangential_vectors_dot_velocity = np.einsum("ijkv,ijkv->ijk", tangential_vectors, self.velocity)
+
+            sum_tangential_coefficients = np.inner(tangential_vectors, self.allowed_velocities)
+
+            sum_all_coefficients = sum_partial_coefficients * sum_tangential_coefficients
+
+            all_terms_sum = affected_fluid_matrix[..., i]
+            all_terms_sum += -density_state_matrix_sixth * ci_dot_velocity
+            all_terms_sum += -density_state_matrix_third * tangential_vectors_dot_velocity
+            all_terms_sum += 0.5 * np.einsum("ijkv,ijkv->ijk", affected_fluid_matrix, sum_all_coefficients)
+
+            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum, (dx, dy, dz), axis=(0, 1, 2))
