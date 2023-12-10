@@ -27,7 +27,7 @@ class BoundaryConditions:
     def remove_fluid_from_boundary(self, fluid_state: BoltzmannFluidState) -> None:
         fluid_state_matrix = fluid_state.fluid_state
         fluid_state_matrix[self.affected_cells, ...] = 0
-        
+
 
 class NoSlipBoundaryConditions(BoundaryConditions):
     def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
@@ -45,8 +45,9 @@ class NoSlipBoundaryConditions(BoundaryConditions):
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
             reverse_index = self.reverse_direction_indeces[i]
-            fluid_state_matrix[..., reverse_index] += np.roll(affected_fluid_matrix[..., i], (dx, dy, dz), axis=(0, 1, 2))
-            
+            fluid_state_matrix[..., reverse_index] += np.roll(affected_fluid_matrix[..., i],
+                                                              (dx, dy, dz), axis=(0, 1, 2))
+
 
 class ConstantVelocityBoundaryConditions(BoundaryConditions):
     def _update_velocities(self, boundary_condition_delta: BoundaryConditionConstantVelocityDelta) -> None:
@@ -68,6 +69,7 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         fluid_state_matrix = fluid_state.fluid_state
         density_state_matrix = FluidDensityState.from_boltzmann_state(fluid_state).density_state
         affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
+        fluid_state_matrix[self.affected_cells] = 0
 
         density_state_matrix_third = density_state_matrix / 3
         density_state_matrix_sixth = density_state_matrix / 6
@@ -77,14 +79,18 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         # TODO: Verify this THOROUGHLY @Rafał
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
+
             reverse_index = self.reverse_direction_indeces[i]
 
-            # TODO: Verify that this is correct @Rafał (very important)
-            tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
+            normal_vectors_dot_dr = np.inner(self.normal_vectors, dr)
+
+            # TODO: Verify that this is correct @Rafał (this is very important)
+            tangential_vectors = dr - self.normal_vectors * normal_vectors_dot_dr[..., np.newaxis]
 
             ci_dot_velocity = np.inner(self.velocity, dr)
 
-            tangential_vectors_dot_velocity = np.einsum("ijkv,ijkv->ijk", tangential_vectors, self.velocity)
+            tangential_vectors_dot_velocity = np.einsum("ijkv,ijkv->ijk",
+                                                        tangential_vectors, self.velocity)
 
             sum_tangential_coefficients = np.inner(tangential_vectors, self.allowed_velocities)
 
@@ -93,6 +99,8 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
             all_terms_sum = affected_fluid_matrix[..., i]
             all_terms_sum += -density_state_matrix_sixth * ci_dot_velocity
             all_terms_sum += -density_state_matrix_third * tangential_vectors_dot_velocity
-            all_terms_sum += 0.5 * np.einsum("ijkv,ijkv->ijk", affected_fluid_matrix, sum_all_coefficients)
+            all_terms_sum += 0.5 * np.einsum("ijkv,ijkv->ijk",
+                                             affected_fluid_matrix, sum_all_coefficients)
 
-            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum, (dx, dy, dz), axis=(0, 1, 2))
+            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum * (normal_vectors_dot_dr < 0),
+                                                              (dx, dy, dz), axis=(0, 1, 2))

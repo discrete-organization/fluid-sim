@@ -55,5 +55,5 @@ class BoltzmannFluid:
 
         print("Suma", self._fluid_state.fluid_state.sum())
 
-        self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
         self._constant_velocity_boundary_conditions.process_fluid_state(self._fluid_state)
+        self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
