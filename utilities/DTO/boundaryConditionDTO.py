@@ -40,6 +40,7 @@ class BoundaryConditionNoSlipDelta(BoundaryConditionDelta):
 @dataclass
 class BoundaryConditionConstantVelocityDelta(BoundaryConditionDelta):
     velocity: Vector3Float
+    normal: Vector3Float
 
 
 @dataclass

@@ -43,10 +43,17 @@ class ModelConfigReader:
                     yield BoundaryConditionNoSlipDelta(boundary_cube)
                 case "constant-velocity":
                     velocity_json = data_json["velocity"]
+                    normal_direction_json = data_json["normal_direction"]
+
+                    velocity_json = Vector3Float(velocity_json["x"], velocity_json["y"], velocity_json["z"])
+                    normal_direction = Vector3Float(normal_direction_json["x"],
+                                                    normal_direction_json["y"],
+                                                    normal_direction_json["z"])
 
                     yield BoundaryConditionConstantVelocityDelta(
                         boundary_cube,
-                        Vector3Float(velocity_json["x"], velocity_json["y"], velocity_json["z"]),
+                        velocity_json,
+                        normal_direction / normal_direction.length()
                     )
                 case "initial":
                     yield BoundaryConditionInitialDelta(
@@ -73,7 +80,7 @@ class ModelConfigReader:
         print(f"Relaxation time: {relaxation_time}")
 
         # TODO: check this calculation @Rafał
-        speed_of_sound = cell_length / time_delta# * 3 ** 0.5
+        speed_of_sound = cell_length / time_delta / (3 ** 0.5)
         print(f"Speed of sound: {speed_of_sound}")
 
         return SimulationParameters(viscosity, time_delta, cell_length, speed_of_sound, relaxation_time)

@@ -66,7 +66,7 @@ class Vector3Float:
             raise ValueError(f"vector must be a 3D vector, but is {vector.shape}")
 
         if vector.dtype != np.float64:
-            raise ValueError(f"vector must be of type int64, but is {vector.dtype}")
+            raise ValueError(f"vector must be of type float64, but is {vector.dtype}")
 
     def __init__(self, x: int, y: int, z: int) -> None:
         self._vector = np.array([x, y, z])
@@ -80,19 +80,19 @@ class Vector3Float:
         return Vector3Float(x, y, z)
 
     def __add__(self, other):
-        return Vector3Int.from_numpy(self._vector + other._vector)
+        return Vector3Float.from_numpy(self._vector + other._vector)
 
     def __sub__(self, other):
-        return Vector3Int.from_numpy(self._vector - other._vector)
+        return Vector3Float.from_numpy(self._vector - other._vector)
 
     def __mul__(self, other):
-        return Vector3Int.from_numpy(self._vector * other)
+        return Vector3Float.from_numpy(self._vector * other)
 
     def __truediv__(self, other):
-        return Vector3Int.from_numpy(self._vector / other)
+        return Vector3Float.from_numpy(self._vector / other)
 
     def __floordiv__(self, other):
-        return Vector3Int.from_numpy(self._vector // other)
+        return Vector3Float.from_numpy(self._vector // other)
 
     def __str__(self):
         return f"Vector3({self._vector})"
@@ -114,3 +114,6 @@ class Vector3Float:
 
     def to_numpy(self) -> np.ndarray[np.float64]:
         return self._vector
+
+    def length(self) -> float:
+        return np.linalg.norm(self._vector)

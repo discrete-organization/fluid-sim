@@ -5,7 +5,7 @@
         "depth": 1,
         "viscosity": 0.0002,
         "time_delta": 0.0125,
-        "cell_length": 0.025
+        "cell_length": 0.01
     },
     "boundaries": [
         {
@@ -88,6 +88,11 @@
                     "x": 0.1,
                     "y": 0.1,
                     "z": 0.1
+                },
+                "normal_direction": {
+                    "x": 0.0,
+                    "y": 2.0,
+                    "z": 1.0
                 }
             }
         },
@@ -106,6 +111,11 @@
                     "x": -0.5,
                     "y": -0.1,
                     "z": 0.1
+                },
+                "normal_direction": {
+                    "x": -1.0,
+                    "y": 2.0,
+                    "z": 1.0
                 }
             }
         },

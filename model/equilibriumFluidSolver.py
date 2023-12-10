@@ -45,8 +45,8 @@ class EquilibriumFluidState:
         velocity_coefficient = first_element + second_element + third_element + fourth_element
 
         velocity_coefficient_weighted = einsum("ijkv,v->ijkv",
-                                                  velocity_coefficient,
-                                                  equilibrium_weights.weights)
+                                               velocity_coefficient,
+                                               equilibrium_weights.weights)
 
         result_field = einsum("ijk,ijkv->ijkv", density.density_state, velocity_coefficient_weighted)
 
