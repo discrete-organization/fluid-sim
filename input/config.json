@@ -24,6 +24,19 @@
         {
             "boundary_type": "no-slip",
             "cube": {
+                "x": 85,
+                "y": 45,
+                "z": 0,
+                "width": 10,
+                "height": 10,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
                 "x": 0,
                 "y": 0,
                 "z": 0,
@@ -135,7 +148,7 @@
             "cube": {
                 "x": 20,
                 "y": 20,
-                "z": 0,
+                "z": -1000,
                 "width": 20,
                 "height": 20,
                 "depth": 200
@@ -169,7 +182,7 @@
             "cube": {
                 "x": 50,
                 "y": 25,
-                "z": 0,
+                "z": -1000,
                 "width": 20,
                 "height": 20,
                 "depth": 20

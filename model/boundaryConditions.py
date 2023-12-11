@@ -27,7 +27,7 @@ class BoundaryConditions:
     def remove_fluid_from_boundary(self, fluid_state: BoltzmannFluidState) -> None:
         fluid_state_matrix = fluid_state.fluid_state
         fluid_state_matrix[self.affected_cells, ...] = 0
-        
+
 
 class NoSlipBoundaryConditions(BoundaryConditions):
     def __init__(self, shape: tuple[int, int, int], allowed_velocities: np.ndarray[np.ndarray[np.int32]]):
@@ -45,8 +45,9 @@ class NoSlipBoundaryConditions(BoundaryConditions):
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
             reverse_index = self.reverse_direction_indeces[i]
-            fluid_state_matrix[..., reverse_index] += np.roll(affected_fluid_matrix[..., i], (dx, dy, dz), axis=(0, 1, 2))
-            
+            fluid_state_matrix[..., reverse_index] += np.roll(affected_fluid_matrix[..., i],
+                                                              (dx, dy, dz), axis=(0, 1, 2))
+
 
 class ConstantVelocityBoundaryConditions(BoundaryConditions):
     def _update_velocities(self, boundary_condition_delta: BoundaryConditionConstantVelocityDelta) -> None:
@@ -81,6 +82,7 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
  
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
+
             reverse_index = self.reverse_direction_indeces[i]
 
             tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
