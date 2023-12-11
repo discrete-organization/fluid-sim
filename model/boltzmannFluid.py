@@ -54,6 +54,10 @@ class BoltzmannFluid:
         self._fluid_state = relaxed_state.to_next_boltzmann_state()
 
         print("Suma", self._fluid_state.fluid_state.sum())
+        print("Max", self._fluid_state.fluid_state.max())
 
         self._no_slip_boundary_conditions.process_fluid_state(self._fluid_state)
         self._constant_velocity_boundary_conditions.process_fluid_state(self._fluid_state)
+        self._no_slip_boundary_conditions.remove_fluid_from_boundary(self._fluid_state)
+        self._constant_velocity_boundary_conditions.remove_fluid_from_boundary(self._fluid_state)
+

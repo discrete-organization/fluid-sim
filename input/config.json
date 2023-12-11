@@ -98,8 +98,8 @@
             },
             "data": {
                 "velocity": {
-                    "x": 0.5,
-                    "y": 0.25,
+                    "x": 0.15,
+                    "y": 0.025,
                     "z": 0.0
                 },
                 "normal_direction": {
