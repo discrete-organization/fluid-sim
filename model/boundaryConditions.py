@@ -68,23 +68,26 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         fluid_state_matrix = fluid_state.fluid_state
         density_state_matrix = FluidDensityState.from_boltzmann_state(fluid_state).density_state
         affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
+        fluid_state_matrix[self.affected_cells] = 0
 
         density_state_matrix_third = density_state_matrix / 3
         density_state_matrix_sixth = density_state_matrix / 6
 
-        sum_partial_coefficients = 1 - np.abs(np.inner(self.normal_vectors, self.allowed_velocities))
+        normal_vectors_dot_velocity = np.inner(self.normal_vectors, self.allowed_velocities)
+        sum_partial_coefficients = 1 - np.abs(normal_vectors_dot_velocity)
 
-        # TODO: Verify this THOROUGHLY @Rafał
+        affected_fluid_mask = normal_vectors_dot_velocity <= 0
+        affected_fluid_matrix *= affected_fluid_mask
+ 
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
             reverse_index = self.reverse_direction_indeces[i]
 
-            # TODO: Verify that this is correct @Rafał (very important)
             tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
 
             ci_dot_velocity = np.inner(self.velocity, dr)
 
-            tangential_vectors_dot_velocity = np.einsum("ijkv,ijkv->ijk", tangential_vectors, self.velocity)
+            tangential_vectors_dot_velocity =  np.sum(tangential_vectors * self.velocity, axis=-1)
 
             sum_tangential_coefficients = np.inner(tangential_vectors, self.allowed_velocities)
 
@@ -93,6 +96,6 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
             all_terms_sum = affected_fluid_matrix[..., i]
             all_terms_sum += -density_state_matrix_sixth * ci_dot_velocity
             all_terms_sum += -density_state_matrix_third * tangential_vectors_dot_velocity
-            all_terms_sum += 0.5 * np.einsum("ijkv,ijkv->ijk", affected_fluid_matrix, sum_all_coefficients)
+            all_terms_sum += 0.5 * np.sum(affected_fluid_matrix * sum_all_coefficients, axis=-1)
 
-            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum, (dx, dy, dz), axis=(0, 1, 2))
+            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum * affected_fluid_mask[..., i], (dx, dy, dz), axis=(0, 1, 2))
