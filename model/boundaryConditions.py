@@ -66,37 +66,38 @@ class ConstantVelocityBoundaryConditions(BoundaryConditions):
         self._update_velocities(boundary_condition_delta)
 
     def process_fluid_state(self, fluid_state: BoltzmannFluidState) -> None:
-            fluid_state_matrix = fluid_state.fluid_state
-            density_state_matrix = FluidDensityState.from_boltzmann_state(fluid_state).density_state
-            affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
-            fluid_state_matrix[self.affected_cells] = 0
+        fluid_state_matrix = fluid_state.fluid_state
+        density_state_matrix = FluidDensityState.from_boltzmann_state(fluid_state).density_state
+        affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
 
-            density_state_matrix_third = density_state_matrix / 3
-            density_state_matrix_sixth = density_state_matrix / 6
+        density_state_matrix_third = density_state_matrix / 3
+        density_state_matrix_sixth = density_state_matrix / 6
 
-            normal_vectors_dot_velocity = np.inner(self.normal_vectors, self.allowed_velocities)
-            sum_partial_coefficients = 1 - np.abs(normal_vectors_dot_velocity)
+        normal_vectors_dot_velocity = np.inner(self.normal_vectors, self.allowed_velocities)
+        sum_partial_coefficients = 1 - np.abs(normal_vectors_dot_velocity)
 
-            affected_fluid_mask = normal_vectors_dot_velocity < 0
-            affected_fluid_matrix *= affected_fluid_mask
-    
-            for i, dr in enumerate(self.allowed_velocities):
-                dx, dy, dz = -dr.astype(np.int32)
-                reverse_index = self.reverse_direction_indeces[i]
+        affected_fluid_mask = normal_vectors_dot_velocity < 0
+        affected_fluid_matrix *= affected_fluid_mask
 
-                tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
+        fluid_state_matrix[self.affected_cells] = 0
 
-                ci_dot_velocity = np.inner(self.velocity, dr)
+        for i, dr in enumerate(self.allowed_velocities):
+            dx, dy, dz = -dr.astype(np.int32)
+            reverse_index = self.reverse_direction_indeces[i]
 
-                tangential_vectors_dot_velocity =  np.sum(tangential_vectors * self.velocity, axis=-1)
+            tangential_vectors = dr - self.normal_vectors * np.inner(self.normal_vectors, dr)[..., np.newaxis]
 
-                sum_tangential_coefficients = np.inner(tangential_vectors, self.allowed_velocities)
+            ci_dot_velocity = np.inner(self.velocity, dr)
 
-                sum_all_coefficients = sum_partial_coefficients * sum_tangential_coefficients
+            tangential_vectors_dot_velocity = np.sum(tangential_vectors * self.velocity, axis=-1)
 
-                all_terms_sum = affected_fluid_matrix[..., i]
-                all_terms_sum += -density_state_matrix_sixth * ci_dot_velocity
-                all_terms_sum += -density_state_matrix_third * tangential_vectors_dot_velocity
-                all_terms_sum += 0.5 * np.sum(affected_fluid_matrix * sum_all_coefficients, axis=-1)
+            sum_tangential_coefficients = np.inner(tangential_vectors, self.allowed_velocities)
 
-                fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum * affected_fluid_mask[..., i], (dx, dy, dz), axis=(0, 1, 2))
+            sum_all_coefficients = sum_partial_coefficients * sum_tangential_coefficients
+
+            all_terms_sum = affected_fluid_matrix[..., i]
+            all_terms_sum += -density_state_matrix_sixth * ci_dot_velocity
+            all_terms_sum += -density_state_matrix_third * tangential_vectors_dot_velocity
+            all_terms_sum += 0.5 * np.sum(affected_fluid_matrix * sum_all_coefficients, axis=-1)
+
+            fluid_state_matrix[..., reverse_index] += np.roll(all_terms_sum * affected_fluid_mask[..., i], (dx, dy, dz), axis=(0, 1, 2))

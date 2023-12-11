@@ -99,7 +99,7 @@
             "data": {
                 "velocity": {
                     "x": 0.5,
-                    "y": 0.05,
+                    "y": 0.25,
                     "z": 0.0
                 },
                 "normal_direction": {
