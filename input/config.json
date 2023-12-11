@@ -28,7 +28,7 @@
                 "y": 45,
                 "z": 0,
                 "width": 10,
-                "height": 10,
+                "height": 50,
                 "depth": 200
             },
             "data": {
@@ -39,7 +39,7 @@
             "cube": {
                 "x": 0,
                 "y": 0,
-                "z": 0,
+                "z": 10000,
                 "width": 1,
                 "height": 1000,
                 "depth": 200
@@ -63,7 +63,7 @@
         {
             "boundary_type": "no-slip",
             "cube": {
-                "x": 0,
+                "x": 1,
                 "y": 0,
                 "z": 0,
                 "width": 1000,
@@ -89,17 +89,17 @@
         {
             "boundary_type": "constant-velocity",
             "cube": {
-                "x": 1,
-                "y": 2,
+                "x": 0,
+                "y": 0,
                 "z": 0,
                 "width": 1,
-                "height": 196,
+                "height": 200,
                 "depth": 2
             },
             "data": {
                 "velocity": {
-                    "x": 0.15,
-                    "y": 0.0,
+                    "x": 0.5,
+                    "y": 0.05,
                     "z": 0.0
                 },
                 "normal_direction": {
@@ -148,7 +148,7 @@
             "cube": {
                 "x": 20,
                 "y": 20,
-                "z": -1000,
+                "z": 0,
                 "width": 20,
                 "height": 20,
                 "depth": 200
@@ -182,7 +182,7 @@
             "cube": {
                 "x": 50,
                 "y": 25,
-                "z": -1000,
+                "z": 0,
                 "width": 20,
                 "height": 20,
                 "depth": 20
