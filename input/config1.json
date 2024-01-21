@@ -2,7 +2,7 @@
     "fluid_box": {
         "width": 400,
         "height": 200,
-        "depth": 1,
+        "depth": 3,
         "viscosity": 0.0002,
         "time_delta": 0.0125,
         "cell_length": 0.01
@@ -11,11 +11,11 @@
         {
             "boundary_type": "no-slip",
             "cube": {
-                "x": 80,
-                "y": 60,
+                "x": 100,
+                "y": 45,
                 "z": 0,
-                "width": 30,
-                "height": 30,
+                "width": 10,
+                "height": 10,
                 "depth": 200
             },
             "data": {
@@ -24,24 +24,11 @@
         {
             "boundary_type": "no-slip",
             "cube": {
-                "x": 50,
-                "y": 35,
+                "x": 85,
+                "y": 45,
                 "z": 0,
-                "width": 30,
-                "height": 100,
-                "depth": 200
-            },
-            "data": {
-            }
-        },
-        {
-            "boundary_type": "no-slip",
-            "cube": {
-                "x": 20,
-                "y": 60,
-                "z": 0,
-                "width": 30,
-                "height": 30,
+                "width": 10,
+                "height": 50,
                 "depth": 200
             },
             "data": {
