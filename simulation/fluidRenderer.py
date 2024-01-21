@@ -19,7 +19,7 @@ class FluidRenderer:
                                               cv2.VideoWriter_fourcc(*'mp4v'), 24,
                                               draw_size[:2], True)
 
-    def render_fluid(self, fluid: BoltzmannFluid) -> None:
+    def render_fluid(self, fluid: BoltzmannFluid, z: int) -> None:
         fluid_density_state: FluidDensityState = FluidDensityState.from_boltzmann_state(fluid._fluid_state)
         self._density_matrix = fluid_density_state.density_state
         fluid_velocity_state = FluidVelocityState.from_boltzmann_state(fluid._fluid_state, fluid_density_state,
@@ -31,10 +31,8 @@ class FluidRenderer:
         self._not_constant_velocity_boundaries_mask = np.repeat(1 - fluid._constant_velocity_boundary_conditions.affected_cells,
                                                                 3, axis=-1).astype(np.uint8)
         
-        # TODO Create adjustable transection, modifiable with slider
-        chosen_z = self._velocity_matrix.shape[2] // 2
-        self._density_matrix = self._density_matrix[:, :, chosen_z]
-        self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
+        self._density_matrix = self._density_matrix[:, :, z]
+        self._velocity_matrix = self._velocity_matrix[:, :, z, :]
 
         if self._simulation_args.use_density:
             self._draw_density()
