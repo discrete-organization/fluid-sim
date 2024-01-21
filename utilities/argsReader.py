@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class SimulationArgs:
+    z: int
     config_path: str
     steps_per_frame: int
     output_path: str
@@ -16,6 +17,7 @@ class ArgsReader:
     @staticmethod
     def read_args() -> SimulationArgs:
         parser = argparse.ArgumentParser()
+        parser.add_argument('--zaxis', '-z', type=int, default='0')
         parser.add_argument('--config', '-c', type=str, default='input/config.json')
         parser.add_argument('--steps-per-frame', '-s', type=int, default='10')
         parser.add_argument('--output', '-o', type=str, default='output')
@@ -25,7 +27,7 @@ class ArgsReader:
 
         args = parser.parse_args()
 
-        return SimulationArgs(args.config, args.steps_per_frame,
+        return SimulationArgs(args.zaxis, args.config, args.steps_per_frame,
                               'output/' + args.output + '.mp4',
                               args.number_of_steps, not args.no_screen,
                               args.use_density)

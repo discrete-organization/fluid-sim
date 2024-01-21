@@ -42,6 +42,9 @@ class Simulator:
                     raise ValueError(f"Invalid boundary condition type: {type(boundary_condition_delta)}")
         self._fluid.prepare_boundary_conditions()
 
+        if not 0 <= self._simulation_args.z < lattice_shape.get_z():
+            raise ValueError(f"Invalid z coordinate: {self._simulation_args.z}. Change value to one within the boundaries ({lattice_shape.get_z()}).")
+
     def _pygame_init(self) -> None:
         pygame.init()
         pygame.display.set_caption("Fluid simulation")
@@ -73,7 +76,7 @@ class Simulator:
         if self._simulation_args.draw_on_screen:
             self.window.fill(self.constants.BLACK)
 
-        self._fluid_renderer.render_fluid(self._fluid)
+        self._fluid_renderer.render_fluid(self._fluid, self._simulation_args.z)
 
         if not self._simulation_args.draw_on_screen:
             return

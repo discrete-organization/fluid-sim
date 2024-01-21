@@ -20,7 +20,7 @@ class FluidRenderer:
                                               draw_size[:2], True)
         self._legend_fond = pygame.font.SysFont("monospace", 15)
 
-    def render_fluid(self, fluid: BoltzmannFluid) -> None:
+    def render_fluid(self, fluid: BoltzmannFluid, z: int) -> None:
         fluid_density_state: FluidDensityState = FluidDensityState.from_boltzmann_state(fluid._fluid_state)
         self._density_matrix = fluid_density_state.density_state
         fluid_velocity_state = FluidVelocityState.from_boltzmann_state(fluid._fluid_state, fluid_density_state,
@@ -31,10 +31,8 @@ class FluidRenderer:
             .astype(np.uint8)
         self._not_constant_velocity_boundaries_mask = np.repeat(1 - fluid._constant_velocity_boundary_conditions.affected_cells,
                                                                 3, axis=-1).astype(np.uint8)
-
-        chosen_z = self._velocity_matrix.shape[2] // 2
-        self._density_matrix = self._density_matrix[:, :, chosen_z]
-        self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
+        self._density_matrix = self._density_matrix[:, :, z]
+        self._velocity_matrix = self._velocity_matrix[:, :, z, :]
 
         if self._simulation_args.use_density:
             self._draw_density()
@@ -58,19 +56,27 @@ class FluidRenderer:
     def _draw_density_legend(self, min_density_value: float, max_density_value: float):
         info = pygame.display.Info()
         legend_width, legend_height = 50, 200
-        legend_padding = 10
+        legend_padding = 20
         texts_count = 10
         legend_position = (info.current_w - legend_width - legend_padding, legend_padding)
 
         texture_vector = np.arange(0.0, 255.0, 255.0 / legend_height)
         texture_matrix = np.repeat(texture_vector[:, np.newaxis], legend_width, axis=-1).T
         texture_matrix_rgb = np.repeat(texture_matrix[..., np.newaxis], 3, axis=-1).astype(np.uint8)
+
+        border_color = [0, 0, 0]
+        texture_matrix_rgb[0, :, :] = border_color
+        texture_matrix_rgb[-1, :, :] = border_color
+        texture_matrix_rgb[:, 0, :] = border_color
+        texture_matrix_rgb[:, -1, :] = border_color
+
         texture_surface = pygame.surfarray.make_surface(texture_matrix_rgb)
 
         text_distance_pixels = legend_height // texts_count
         text_distance_values = (max_density_value - min_density_value) / texts_count
-        text_values = np.arange(min_density_value, max_density_value, text_distance_values)
-        text_y_positions = np.arange(legend_padding, legend_height + legend_padding, text_distance_pixels)
+        text_values = np.arange(min_density_value, max_density_value + text_distance_values, text_distance_values)
+        text_y_positions = np.arange(legend_padding, legend_height + legend_padding + text_distance_pixels,
+                                     text_distance_pixels)
 
         for text_value, text_y_position in zip(text_values, text_y_positions):
             text = self._legend_fond.render(f"{text_value:.2f}", True, pygame.Color("blue"))
