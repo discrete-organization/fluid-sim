@@ -39,7 +39,7 @@ class FluidRenderer:
         else:
             self._draw_velocity()
 
-    def _draw_density(self):
+    def _draw_density(self) -> None:
         max_density = np.max(self._density_matrix)
         min_density = np.min(self._density_matrix)
         
@@ -53,7 +53,30 @@ class FluidRenderer:
         self._draw_density_legend(min_density, max_density)
         self._save_frame(rgb_colors_matrix)
 
-    def _draw_density_legend(self, min_density_value: float, max_density_value: float):
+    def _draw_velocity(self) -> None:
+        speeds_matrix = np.linalg.norm(self._velocity_matrix, axis=-1)
+        max_speed = np.max(speeds_matrix)
+        min_speed = np.min(speeds_matrix)
+
+        normalized_velocity_matrix = self._velocity_matrix / max_speed \
+            if max_speed != 0 else np.zeros_like(self._velocity_matrix)
+
+        hsv_colors_matrix = np.zeros(speeds_matrix.shape + (3,))
+
+        hsv_colors_matrix[..., 0] = (np.arctan2(normalized_velocity_matrix[..., 1], normalized_velocity_matrix[..., 0])
+                                     + np.pi) / (2 * np.pi)
+        hsv_colors_matrix[..., 1] = np.ones_like(speeds_matrix)
+        hsv_colors_matrix[..., 2] = (speeds_matrix - min_speed) / (max_speed - min_speed) \
+            if max_speed != min_speed else np.zeros_like(speeds_matrix)
+
+        rgb_colors_matrix = (colors.hsv_to_rgb(hsv_colors_matrix) * 255).astype(np.uint8)
+        rgb_colors_matrix = self._apply_boundaries_masks(rgb_colors_matrix)
+
+        self._draw_surface_from_matrix(rgb_colors_matrix)
+        self._draw_velocity_legend(min_speed, max_speed)
+        self._save_frame(rgb_colors_matrix)
+
+    def _draw_density_legend(self, min_density_value: float, max_density_value: float) -> None:
         info = pygame.display.Info()
         legend_width, legend_height = 50, 200
         legend_padding = 20
@@ -86,27 +109,67 @@ class FluidRenderer:
 
         self._window.blit(texture_surface, legend_position)
 
-    def _draw_velocity(self):
-        speeds_matrix = np.linalg.norm(self._velocity_matrix, axis=-1)
-        max_speed = np.max(speeds_matrix)
-        min_speed = np.min(speeds_matrix)
+    def _draw_velocity_legend(self, min_speed_value: float, max_speed_value: float) -> None:
+        info = pygame.display.Info()
+        legend_width, legend_height = 300, 200
+        legend_padding = 20
+        texts_count_val = 10
+        texts_counts_direction = 7
 
-        normalized_velocity_matrix = self._velocity_matrix / max_speed \
-            if max_speed != 0 else np.zeros_like(self._velocity_matrix)
+        legend_position = (info.current_w - legend_width - legend_padding, legend_padding)
 
-        hsv_colors_matrix = np.zeros(speeds_matrix.shape + (3,))
+        vector_value_step = 1.0 / legend_height
+        vector_direction_step = 1.0 / legend_width
 
-        hsv_colors_matrix[..., 0] = (np.arctan2(normalized_velocity_matrix[..., 1], normalized_velocity_matrix[..., 0]) + np.pi) \
-            / (2 * np.pi)
-        hsv_colors_matrix[..., 1] = np.ones_like(speeds_matrix)
-        hsv_colors_matrix[..., 2] = (speeds_matrix - min_speed) / (max_speed - min_speed) \
-            if max_speed != min_speed else np.zeros_like(speeds_matrix)
+        texture_vector_value = np.arange(0.0, 1.0, vector_value_step)
+        texture_vector_direction = np.arange(0.0, 1.0, vector_direction_step)
 
-        rgb_colors_matrix = (colors.hsv_to_rgb(hsv_colors_matrix) * 255).astype(np.uint8)
-        rgb_colors_matrix = self._apply_boundaries_masks(rgb_colors_matrix)
+        texture_matrix_value = np.repeat(texture_vector_value[:, np.newaxis], legend_width, axis=-1).T
+        texture_matrix_direction = np.repeat(texture_vector_direction[:, np.newaxis], legend_height, axis=-1)
 
-        self._draw_surface_from_matrix(rgb_colors_matrix)
-        self._save_frame(rgb_colors_matrix)
+        texture_matrix_hsv = np.zeros((legend_width, legend_height, 3))
+        texture_matrix_hsv[..., 0] = texture_matrix_direction
+        texture_matrix_hsv[..., 1] = 1.0
+        texture_matrix_hsv[..., 2] = texture_matrix_value
+
+        texture_matrix_rgb = (colors.hsv_to_rgb(texture_matrix_hsv) * 255).astype(np.uint8)
+
+        border_color = [0, 0, 0]
+        texture_matrix_rgb[0, :, :] = border_color
+        texture_matrix_rgb[-1, :, :] = border_color
+        texture_matrix_rgb[:, 0, :] = border_color
+        texture_matrix_rgb[:, -1, :] = border_color
+
+        texture_surface = pygame.surfarray.make_surface(texture_matrix_rgb)
+
+        text_distance_pixels = legend_height // texts_count_val
+        text_distance_values = (max_speed_value - min_speed_value) / texts_count_val
+
+        text_values = np.arange(min_speed_value, max_speed_value + text_distance_values, text_distance_values)
+        text_values_y_positions = np.arange(legend_padding, legend_height + legend_padding + text_distance_pixels,
+                                            text_distance_pixels)
+
+        text_directions_distance_values = 2 * np.pi / texts_counts_direction
+        text_directions_distance_pixels = legend_width // texts_counts_direction
+
+        text_directions = np.arange(0.0, 2 * np.pi + text_directions_distance_values, text_directions_distance_values)
+        text_directions_x_positions = np.arange(legend_position[0], legend_position[0] + legend_width +
+                                                + text_directions_distance_pixels,
+                                                text_directions_distance_pixels)
+
+        for text_value, text_y_position in zip(text_values, text_values_y_positions):
+            text = self._legend_fond.render(f"{text_value:.2f}", True, pygame.Color("blue"))
+            text_y_position_centered = text_y_position - text.get_height() // 2
+            self._window.blit(text, (legend_position[0] - text.get_width() - legend_padding,
+                                     text_y_position_centered))
+
+        for text_direction, text_x_position in zip(text_directions, text_directions_x_positions):
+            print(text_direction)
+            text = self._legend_fond.render(f"{text_direction:.2f}", True, pygame.Color("blue"))
+            text_x_position_centered = text_x_position - text.get_width() // 2
+            self._window.blit(text, (text_x_position_centered, legend_position[1] + legend_height + legend_padding))
+
+        self._window.blit(texture_surface, legend_position)
 
     def _apply_boundaries_masks(self, matrix: np.ndarray) -> np.ndarray:
         return matrix
@@ -137,6 +200,6 @@ class FluidRenderer:
         frame_bgr_flipped = np.swapaxes(frame_bgr, 0, 1)
         self._output_writer.write(frame_bgr_flipped)
 
-    def save_video(self):
+    def save_video(self) -> None:
         self._output_writer.release()
         print("Video saved")

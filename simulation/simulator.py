@@ -93,6 +93,11 @@ class Simulator:
                                   self._simulation_args.number_of_steps - self._simulation_steps_count)
             for _ in range(number_of_steps):
                 self._simulation_step()
+                self._process_events()
+
+                if not self._running:
+                    break
+
             self._pygame_render()
 
         self._fluid_renderer.save_video()
