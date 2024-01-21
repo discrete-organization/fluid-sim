@@ -18,6 +18,7 @@ class FluidRenderer:
         self._output_writer = cv2.VideoWriter(simulation_args.output_path,
                                               cv2.VideoWriter_fourcc(*'mp4v'), 24,
                                               draw_size[:2], True)
+        self._legend_fond = pygame.font.SysFont("monospace", 15)
 
     def render_fluid(self, fluid: BoltzmannFluid) -> None:
         fluid_density_state: FluidDensityState = FluidDensityState.from_boltzmann_state(fluid._fluid_state)
@@ -30,8 +31,7 @@ class FluidRenderer:
             .astype(np.uint8)
         self._not_constant_velocity_boundaries_mask = np.repeat(1 - fluid._constant_velocity_boundary_conditions.affected_cells,
                                                                 3, axis=-1).astype(np.uint8)
-        
-        # TODO Create adjustable transection, modifiable with slider
+
         chosen_z = self._velocity_matrix.shape[2] // 2
         self._density_matrix = self._density_matrix[:, :, chosen_z]
         self._velocity_matrix = self._velocity_matrix[:, :, chosen_z, :]
@@ -52,7 +52,33 @@ class FluidRenderer:
         rgb_colors_matrix = self._apply_boundaries_masks(rgb_colors_matrix)
 
         self._draw_surface_from_matrix(rgb_colors_matrix)
+        self._draw_density_legend(min_density, max_density)
         self._save_frame(rgb_colors_matrix)
+
+    def _draw_density_legend(self, min_density_value: float, max_density_value: float):
+        info = pygame.display.Info()
+        legend_width, legend_height = 50, 200
+        legend_padding = 10
+        texts_count = 10
+        legend_position = (info.current_w - legend_width - legend_padding, legend_padding)
+
+        texture_vector = np.arange(0.0, 255.0, 255.0 / legend_height)
+        texture_matrix = np.repeat(texture_vector[:, np.newaxis], legend_width, axis=-1).T
+        texture_matrix_rgb = np.repeat(texture_matrix[..., np.newaxis], 3, axis=-1).astype(np.uint8)
+        texture_surface = pygame.surfarray.make_surface(texture_matrix_rgb)
+
+        text_distance_pixels = legend_height // texts_count
+        text_distance_values = (max_density_value - min_density_value) / texts_count
+        text_values = np.arange(min_density_value, max_density_value, text_distance_values)
+        text_y_positions = np.arange(legend_padding, legend_height + legend_padding, text_distance_pixels)
+
+        for text_value, text_y_position in zip(text_values, text_y_positions):
+            text = self._legend_fond.render(f"{text_value:.2f}", True, pygame.Color("blue"))
+            text_y_position_centered = text_y_position - text.get_height() // 2
+            self._window.blit(text, (legend_position[0] - text.get_width() - legend_padding,
+                                     text_y_position_centered))
+
+        self._window.blit(texture_surface, legend_position)
 
     def _draw_velocity(self):
         speeds_matrix = np.linalg.norm(self._velocity_matrix, axis=-1)
