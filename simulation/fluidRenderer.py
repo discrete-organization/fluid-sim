@@ -118,8 +118,8 @@ class FluidRenderer:
 
             if self._simulation_args.draw_on_screen:
                 self._window.blit(text, (x_position, y_position))
-            render_window_swapped = cv2.putText(render_window_swapped, f"{text_value:.2f}", (x_position, y_position),
-                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            render_window_swapped = cv2.putText(render_window_swapped, f"{text_value:.2f}", (x_position, text_y_position),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
         render_window = np.swapaxes(render_window_swapped, 0, 1)
 
@@ -196,7 +196,7 @@ class FluidRenderer:
 
             if self._simulation_args.draw_on_screen:
                 self._window.blit(text, (position_x, position_y))
-            render_window_swapped = cv2.putText(render_window_swapped, f"{text_value:.2f}", (position_x, position_y),
+            render_window_swapped = cv2.putText(render_window_swapped, f"{text_value:.2f}", (position_x, text_y_position),
                                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
         for text_direction, text_x_position in zip(text_directions, text_directions_x_positions):
@@ -209,7 +209,7 @@ class FluidRenderer:
             if self._simulation_args.draw_on_screen:
                 self._window.blit(text, (position_x, position_y))
             render_window_swapped = cv2.putText(render_window_swapped, f"{text_direction:.2f}",
-                                                (position_x, position_y),
+                                                (text_x_position, position_y),
                                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
         render_window = np.swapaxes(render_window_swapped, 0, 1)
