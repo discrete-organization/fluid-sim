@@ -1,0 +1,192 @@
+{
+    "fluid_box": {
+        "width": 400,
+        "height": 200,
+        "depth": 1,
+        "viscosity": 0.0002,
+        "time_delta": 0.0125,
+        "cell_length": 0.01
+    },
+    "boundaries": [
+        
+       
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 10000,
+                "width": 1,
+                "height": 1000,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 399,
+                "y": 0,
+                "z": 0,
+                "width": 1,
+                "height": 1000,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 1,
+                "y": 0,
+                "z": 0,
+                "width": 1000,
+                "height": 1,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "no-slip",
+            "cube": {
+                "x": 0,
+                "y": 199,
+                "z": 0,
+                "width": 1000,
+                "height": 1,
+                "depth": 200
+            },
+            "data": {
+            }
+        },
+        {
+            "boundary_type": "constant-velocity",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "width": 1,
+                "height": 200,
+                "depth": 2
+            },
+            "data": {
+                "velocity": {
+                    "x": 0.15,
+                    "y": 0.025,
+                    "z": 0.0
+                },
+                "normal_direction": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            }
+        },
+        {
+            "boundary_type": "initial",
+            "cube": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "width": 2000,
+                "height": 2000,
+                "depth": 2000
+            },
+            "data": {
+                "boltzmann_f19": [
+                    20.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "boundary_type": "initial",
+            "cube": {
+                "x": 170,
+                "y": 80,
+                "z": 0,
+                "width": 20,
+                "height": 20,
+                "depth": 200
+            },
+            "data": {
+                "boltzmann_f19": [
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "boundary_type": "initial",
+            "cube": {
+                "x": 210,
+                "y": 100,
+                "z": 0,
+                "width": 20,
+                "height": 20,
+                "depth": 200
+            },
+            "data": {
+                "boltzmann_f19": [
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0,
+                    0.0,
+                    3.0,
+                    0.0
+                ]
+            }
+        }
+        
+    ]
+}
