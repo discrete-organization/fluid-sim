@@ -30,12 +30,9 @@ class EquilibriumFluidState:
 
         speed_of_sound_squared = speed_of_sound ** 2
 
-        # TODO: Verify that this is correct @Rafał
         u_dot_products = einsum("ijkv,ijkv->ijk", velocity.velocity_state, velocity.velocity_state)[:, :, :, np.newaxis]
         u_e_dot_products = einsum("ijkw,vw->ijkv", velocity.velocity_state, allowed_velocities)
         u_e_dot_products_squared = u_e_dot_products ** 2
-
-        # TODO: Verify if the components of u_dot will be added correctly @Rafał
 
         velocity_coefficient = 1
         velocity_coefficient += 3 * u_e_dot_products / speed_of_sound

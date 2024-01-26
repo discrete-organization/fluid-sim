@@ -62,7 +62,6 @@ class FluidVelocityState:
         '''
         velocities = einsum("ijkv,vw->ijkw", fluid_state, allowed_velocities) \
             * simulation_config.speed_of_sound
-        # TODO: Verify that this is correct @Rafał
 
         density_matrix_copy = np.copy(density_state.density_state)
         density_matrix_copy[density_matrix_copy == 0] = 1

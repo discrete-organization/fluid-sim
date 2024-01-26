@@ -41,7 +41,6 @@ class NoSlipBoundaryConditions(BoundaryConditions):
         affected_fluid_matrix = fluid_state_matrix * self.affected_cells[..., np.newaxis]
         fluid_state_matrix[self.affected_cells] = 0
 
-        # TODO: Verify that this is correct @Rafał
         for i, dr in enumerate(self.allowed_velocities):
             dx, dy, dz = -dr.astype(np.int32)
             reverse_index = self.reverse_direction_indeces[i]
